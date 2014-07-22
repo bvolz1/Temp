@@ -25,6 +25,31 @@ int main(int argc, char *argv[])
 {
 
 	debugPrintln("Starting LVH LINX");
-	LINXServer.begin();
-
+	
+	//Start LINX TCP Server
+	
+	
+	while(1)
+	{
+		//TCP Server State Machine
+		switch(LINXServer.state)
+		{
+			case START:
+				debugPrintln("Start State");
+				LINXServer.begin(6999);
+				break;
+			
+			case LISTENING:
+				debugPrintln("Listening State");
+				LINXServer.acceptConnection();
+				break;					
+				
+			case CONNECTED:
+				debugPrintln("Connected State");
+				
+				break;	
+				
+		}	
+	}
+	
 }
