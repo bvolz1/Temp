@@ -1,5 +1,5 @@
 all:
-	g++ LINX_Pi.cpp LINX_Networking.cpp LINX_Common.cpp -o LINX_Pi
+	g++ LINX_Pi.cpp LINX_Networking.cpp LINX_Common.cpp -lrt -o LINX_Pi
 	
 test:
 	g++ test.cpp LINX_Common.cpp -o test

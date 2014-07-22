@@ -7,5 +7,6 @@
 
 void debugPrint(char* message);
 void debugPrintln(char* message);
+unsigned long getSeconds();
 
 #endif //LINX_COMMON_H

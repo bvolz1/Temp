@@ -1,7 +1,8 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <errno.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
-#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <netinet/in.h>
@@ -16,6 +17,7 @@
 TCPServer::TCPServer()
 {
 	state = START;
+	timeout.tv_sec = 10;		//Set Socket Time-out To Default Value
 }
 
 /****************************************************************************************
@@ -87,17 +89,67 @@ int TCPServer::acceptConnection()
 		return -1;
 	}
 	else
-	{
-		debugPrint(inet_ntoa(echoclient.sin_addr));
-		debugPrintln(" Successfully Connected");
-		state = CONNECTED;
+	{		
+		if ( setsockopt (clientsock, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout)) < 0)
+		{
+			debugPrintln("Failed To Set Socket Receive Time-out");
+			return -1;
+		}
+		else
+		{
+			
+			TCPUpdateTime = getSeconds();
+			state = CONNECTED;
+			debugPrint(inet_ntoa(echoclient.sin_addr));
+			debugPrintln(" Successfully Connected");
+		}		
 	}
 	return 0;	
 }
 
 int TCPServer::checkForPacket()
 {
+	int received = -1;
+	
+	if( (received = recv(clientsock, recBuffer, TCP_BUFF_SIZE, 0)) <= 0)
+	{
+		//Time-out Or Error
+		if(errno  == EWOULDBLOCK)
+		{
+			//Time-out Waiting For Data
+			debugPrintln("Time-out Waiting For Data");			
+		}
+		else if(received == 0)
+		{
+			//Client Disconnected
+			state = EXIT;
+		}		
+		else
+		{
+			//Error
+			char err[128];
+			sprintf(err, "Error %d While Waiting For Data", received);			
+			fprintf(stdout, "%s", (char*) err);
+			state = EXIT;
+			return -1;
+		}		
+	}	
+	else
+	{
+		//Data Received
+		char out[256];
+		sprintf(out, "Received %d Bytes : %s \n", received, recBuffer);		
+		fprintf(stdout, "%s", (char*) out);		
+	}
 
+}
+
+int TCPServer::stop()
+{
+	close(serversock);
+	close(clientsock);
+	
+	return 0;
 }
 
 

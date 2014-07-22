@@ -30,13 +30,14 @@ int main(int argc, char *argv[])
 	
 	
 	while(1)
-	{
+	{	
+	
 		//TCP Server State Machine
 		switch(LINXServer.state)
 		{
 			case START:
 				debugPrintln("Start State");
-				LINXServer.begin(6999);
+				LINXServer.begin(7000);
 				break;
 			
 			case LISTENING:
@@ -46,10 +47,16 @@ int main(int argc, char *argv[])
 				
 			case CONNECTED:
 				debugPrintln("Connected State");
-				
+				LINXServer.checkForPacket();
 				break;	
 				
-		}	
+			case EXIT:
+				debugPrintln("Exit State...");
+				exit(-1);
+				break;
+				
+		}
+
 	}
 	
 }

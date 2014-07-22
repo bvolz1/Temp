@@ -9,12 +9,16 @@ class TCPServer
 	public:	
 		/****************************************************************************************
 		**  Variables
-		****************************************************************************************/
-		
+		****************************************************************************************/		
 		TCPServerState state;
 		
+		unsigned char recBuffer[TCP_BUFF_SIZE];
+		
+		unsigned long TCPUpdateTime;
+		struct timeval timeout;
+		
 		int serversock;
-		int clientsock;
+		int clientsock;		
 	
 		struct sockaddr_in echoserver;
 		struct sockaddr_in echoclient;
@@ -31,7 +35,7 @@ class TCPServer
 		int begin(unsigned int serverPort);
 		int acceptConnection();
 		int checkForPacket();
-		int exit();
+		int stop();
 	
 };
 

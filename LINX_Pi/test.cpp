@@ -10,6 +10,9 @@
 int main(int argc, char *argv[])
 {
 
-	debugPrint("Starting LVH LINX");
-
+	//debugPrint("Starting LVH LINX");
+	while(1)
+	{
+		getTicks();
+	}
 }
