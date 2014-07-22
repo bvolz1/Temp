@@ -18,6 +18,7 @@ TCPServer::TCPServer()
 {
 	state = START;
 	timeout.tv_sec = 10;		//Set Socket Time-out To Default Value
+	TCPBufIndex = 0;
 }
 
 /****************************************************************************************
@@ -110,38 +111,135 @@ int TCPServer::acceptConnection()
 int TCPServer::checkForPacket()
 {
 	int received = -1;
+	unsigned char packetSize = 0;
+	errno = 0;
 	
-	if( (received = recv(clientsock, recBuffer, TCP_BUFF_SIZE, 0)) <= 0)
+	//Clear SoF
+	recBuffer[0] = 0;
+	
+	//Watch For New Packet
+	received = peek(recBuffer, PACKET_BUFFER_SIZE);
+	
+	//Wait For At Least First Two Bytes Of Packet
+	if(received >= 2)
+	{
+		fprintf(stdout, "SoF = %d \n", recBuffer[0]);
+		fprintf(stdout, "Len= %d \n", recBuffer[1]);
+		//Check SoF and Packet Size
+		if(recBuffer[0] == 0xFF)
+		{
+			//Valid SoF, Check Packet Size
+			packetSize = recBuffer[1];
+			if(packetSize < received )
+			{
+				//Partial Packet, Make Sure Packet Size Will Fit In Buffer, If It Will Loop To Wait For Remainder Of Packet
+				if(packetSize > PACKET_BUFFER_SIZE)
+				{
+					debugPrintln("Packet Size Too Large For Buffer");
+					state = EXIT;
+					return -1;
+				}				
+				return 0;
+			}			
+			else
+			{
+				//Full Packet In Receive Buffer
+				if( received = read(clientsock, recBuffer, packetSize) < 0 )
+				{
+					//Failed To Read Packet From Buffer
+					debugPrintln("Failed To Read Packet From Buffer");
+					state = EXIT;
+					return -1;				
+				}
+				else
+				{
+					//Process Packet
+					processCommand(recBuffer, sendBuffer);
+					
+					//Send Response Packet
+					unsigned char bytesToSend = sendBuffer[1];
+					if( send(clientsock, sendBuffer, bytesToSend, 0) != bytesToSend)
+					{
+						debugPrintln("Failed To Send Response Packet");
+						state = EXIT;
+						return -1;
+					}
+					return 0;					
+				}
+			}
+		}
+		else
+		{
+			//Bad SoF, Flush Socket
+			recv(clientsock, recBuffer, PACKET_BUFFER_SIZE, 0);		
+		}
+	}
+	
+	/*
+	//Receive New Data From Client Socket
+	if( (received = recv(clientsock, recBuffer+TCPBufIndex, TCP_BUFF_SIZE, 0)) < 0)
 	{
 		//Time-out Or Error
 		if(errno  == EWOULDBLOCK)
 		{
 			//Time-out Waiting For Data
 			debugPrintln("Time-out Waiting For Data");			
-		}
-		else if(received == 0)
-		{
-			//Client Disconnected
-			state = EXIT;
-		}		
+		}			
 		else
 		{
 			//Error
-			char err[128];
-			sprintf(err, "Error %d While Waiting For Data", received);			
-			fprintf(stdout, "%s", (char*) err);
-			state = EXIT;
-			return -1;
+			#ifdef DEBUG_ENABLED
+				char err[128];
+				sprintf(err, "Error %d While Waiting For Data", received);			
+				fprintf(stdout, "%s", (char*) err);
+				state = EXIT;
+				return received;
+			#endif //DEBUG_ENABLED
 		}		
-	}	
+	}
+	else	 if(received == 0)
+	{		
+		//Client Disconnected
+		state = EXIT;		
+	}
 	else
 	{
 		//Data Received
-		char out[256];
-		sprintf(out, "Received %d Bytes : %s \n", received, recBuffer);		
-		fprintf(stdout, "%s", (char*) out);		
+		TCPBufIndex += received;
+		if(TCPBufIndex >= TCP_BUFF_SIZE)
+		{
+			debugPrintln("TCP Receive Buffer Overflow");			
+			state = EXIT;
+			return -1;
+		}
+		
+		#ifdef DEBUG_ENABLED
+			char out[256];
+			sprintf(out, "Received %d Bytes : %s \n", received, recBuffer);		
+			fprintf(stdout, "%s", (char*) out);		
+		#endif //DEBUG_ENABLED		
 	}
-
+	
+	//Check For Valid Packet
+	
+	//Make Sure We Have At Least 2 Bytes (SOF And Packet Size), If Not Loop Until We Have More
+	if(TCPBufIndex >= 2)
+	{
+		//Check for SoF
+		if(recBuffer != 0xFF)
+		{
+			debugPrintln("New Data Receive, But Not SoF");	
+			TCPBufIndex = 0;	//Flush Buffer		
+		}
+		else
+		{
+			//Valid SoF, Read Packet Size
+			
+		
+		}
+	}	
+	
+	*/
 }
 
 int TCPServer::stop()
@@ -150,6 +248,44 @@ int TCPServer::stop()
 	close(clientsock);
 	
 	return 0;
+}
+
+int TCPServer::peek(unsigned char * recBuffer, int bufferSize)
+{
+	int peekReceived = -1;
+	errno = 0;
+	
+	if( (peekReceived = recv(clientsock, recBuffer, bufferSize, MSG_PEEK)) < 0)
+	{
+		//Time-out Or Error
+		if(errno  == EWOULDBLOCK)
+		{
+			//Time-out Waiting For Data
+			debugPrintln("Time-out Waiting For Data");			
+		}			
+		else
+		{
+			//Error
+			#ifdef DEBUG_ENABLED
+				char err[128];
+				sprintf(err, "Error %d While Waiting For Data", peekReceived);			
+				fprintf(stdout, "%s", (char*) err);
+				state = EXIT;
+				return peekReceived;
+			#endif //DEBUG_ENABLED
+		}
+	}
+	else	 if(peekReceived == 0)
+	{		
+		//Client Disconnected
+		debugPrintln("Client Disconnected");			
+		state = EXIT;		
+	}
+	else
+	{
+		//Data Received
+		return peekReceived;		
+	}
 }
 
 

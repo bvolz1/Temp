@@ -12,7 +12,8 @@ class TCPServer
 		****************************************************************************************/		
 		TCPServerState state;
 		
-		unsigned char recBuffer[TCP_BUFF_SIZE];
+		unsigned char recBuffer[PACKET_BUFFER_SIZE];
+		unsigned char sendBuffer[PACKET_BUFFER_SIZE];
 		
 		unsigned long TCPUpdateTime;
 		struct timeval timeout;
@@ -37,6 +38,18 @@ class TCPServer
 		int checkForPacket();
 		int stop();
 	
+	private:
+		/****************************************************************************************
+		**  Variables
+		****************************************************************************************/		
+		int TCPBufIndex;
+		
+		
+		/****************************************************************************************
+		**  Functions
+		****************************************************************************************/
+		int peek(unsigned char * recBuffer, int bufferSize);
+		
 };
 
 #endif //LINX_NETWORKING_H

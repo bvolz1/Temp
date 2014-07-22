@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
 		{
 			case START:
 				debugPrintln("Start State");
-				LINXServer.begin(7000);
+				LINXServer.begin(6999);
 				break;
 			
 			case LISTENING:
@@ -51,10 +51,10 @@ int main(int argc, char *argv[])
 				break;	
 				
 			case EXIT:
-				debugPrintln("Exit State...");
+				debugPrintln("Exit State");
+				LINXServer.stop();
 				exit(-1);
-				break;
-				
+				break;				
 		}
 
 	}
