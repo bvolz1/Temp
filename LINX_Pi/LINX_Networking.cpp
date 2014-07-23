@@ -153,93 +153,39 @@ int TCPServer::checkForPacket()
 				}
 				else
 				{
-					//Process Packet
-					processCommand(recBuffer, sendBuffer);
-					
-					//Send Response Packet
-					unsigned char bytesToSend = sendBuffer[1];
-					if( send(clientsock, sendBuffer, bytesToSend, 0) != bytesToSend)
-					{
-						debugPrintln("Failed To Send Response Packet");
-						state = EXIT;
-						return -1;
+				
+					//Check Checksum
+					if(checksumPassed(recBuffer))
+					{					
+						//Process Packet
+						processCommand(recBuffer, sendBuffer);
+						
+						//Send Response Packet
+						unsigned char bytesToSend = sendBuffer[1];
+						if( send(clientsock, sendBuffer, bytesToSend, 0) != bytesToSend)
+						{
+							debugPrintln("Failed To Send Response Packet");
+							state = EXIT;
+							return -1;
+						}
+						return 0;
 					}
-					return 0;					
+					else
+					{
+						//Checksum Failed
+						debugPrintln("Checksum Failed");
+						recv(clientsock, recBuffer, PACKET_BUFFER_SIZE, MSG_DONTWAIT);	
+					}
 				}
 			}
 		}
 		else
 		{
 			//Bad SoF, Flush Socket
-			recv(clientsock, recBuffer, PACKET_BUFFER_SIZE, 0);		
+			debugPrintln("Bad SoF");
+			recv(clientsock, recBuffer, PACKET_BUFFER_SIZE, MSG_DONTWAIT);		
 		}
 	}
-	
-	/*
-	//Receive New Data From Client Socket
-	if( (received = recv(clientsock, recBuffer+TCPBufIndex, TCP_BUFF_SIZE, 0)) < 0)
-	{
-		//Time-out Or Error
-		if(errno  == EWOULDBLOCK)
-		{
-			//Time-out Waiting For Data
-			debugPrintln("Time-out Waiting For Data");			
-		}			
-		else
-		{
-			//Error
-			#ifdef DEBUG_ENABLED
-				char err[128];
-				sprintf(err, "Error %d While Waiting For Data", received);			
-				fprintf(stdout, "%s", (char*) err);
-				state = EXIT;
-				return received;
-			#endif //DEBUG_ENABLED
-		}		
-	}
-	else	 if(received == 0)
-	{		
-		//Client Disconnected
-		state = EXIT;		
-	}
-	else
-	{
-		//Data Received
-		TCPBufIndex += received;
-		if(TCPBufIndex >= TCP_BUFF_SIZE)
-		{
-			debugPrintln("TCP Receive Buffer Overflow");			
-			state = EXIT;
-			return -1;
-		}
-		
-		#ifdef DEBUG_ENABLED
-			char out[256];
-			sprintf(out, "Received %d Bytes : %s \n", received, recBuffer);		
-			fprintf(stdout, "%s", (char*) out);		
-		#endif //DEBUG_ENABLED		
-	}
-	
-	//Check For Valid Packet
-	
-	//Make Sure We Have At Least 2 Bytes (SOF And Packet Size), If Not Loop Until We Have More
-	if(TCPBufIndex >= 2)
-	{
-		//Check for SoF
-		if(recBuffer != 0xFF)
-		{
-			debugPrintln("New Data Receive, But Not SoF");	
-			TCPBufIndex = 0;	//Flush Buffer		
-		}
-		else
-		{
-			//Valid SoF, Read Packet Size
-			
-		
-		}
-	}	
-	
-	*/
 }
 
 int TCPServer::stop()

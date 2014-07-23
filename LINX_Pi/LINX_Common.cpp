@@ -29,7 +29,7 @@ unsigned long getSeconds()
 	return mTime.tv_sec;
 }
 
-void processCommand(unsigned char* recBuffer, unsigned char* sendBuffer )
+void processCommand(unsigned char recBuffer[], unsigned char sendBuffer[] )
 {
 	debugPrintln("PROCESS COMMAND NOT IMPLEMENTED!!!!");
 	
@@ -37,4 +37,22 @@ void processCommand(unsigned char* recBuffer, unsigned char* sendBuffer )
 	{
 		sendBuffer[i] = recBuffer[i];
 	}
+}
+
+unsigned char computeChecksum(unsigned char* packetBuffer)
+{  
+  unsigned char checksum = 0;
+  
+  //Sum All Bytes In The Packet Except The Last (Checksum Byte)
+  for(int i=0; i<(packetBuffer[1] - 1); i++)
+  {
+    checksum += packetBuffer[i];
+  }  
+  return checksum; 
+}
+
+
+bool checksumPassed(unsigned char* packetBuffer)
+{
+  return (computeChecksum(packetBuffer) == packetBuffer[packetBuffer[1]-1]);
 }
