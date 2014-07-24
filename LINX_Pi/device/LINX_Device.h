@@ -1,57 +1,41 @@
-#ifndef LINX_NETWORKING_H
+#ifndef LINX_DEVICE_H
+#define LINX_DEVICE_H
 
-#define LINX_NETWORKING_H
-#include "device/LINX_Device.h"
 
-//Variables
-enum TCPServerState {START, LISTENING, CONNECTED, CLOSE, EXIT};
-
-class TCPServer
+class LINXDevice
 {
 	public:	
 		/****************************************************************************************
 		**  Variables
 		****************************************************************************************/		
-		TCPServerState state;
+		unsigned char familyCode;
+		unsigned char deviceCode;
 		
-		unsigned char recBuffer[PACKET_BUFFER_SIZE];
-		unsigned char sendBuffer[PACKET_BUFFER_SIZE];
-		
-		unsigned long TCPUpdateTime;
-		struct timeval timeout;
-		
-		int serversock;
-		int clientsock;		
-	
-		struct sockaddr_in echoserver;
-		struct sockaddr_in echoclient;
-	
 		/****************************************************************************************
 		**  Constructors
 		****************************************************************************************/
-		TCPServer();		//Default Constructor
-	
-	
+		LINXDevice();
+			
 		/****************************************************************************************
 		**  Functions
 		****************************************************************************************/
-		int begin(unsigned int serverPort);
-		int acceptConnection();
-		int processPackets(LINXDevice LINXDev);
-		int stop();
-	
+		void processCommand(unsigned char* commandPacketBuffer, unsigned char* responsePacketBuffer);
+		void statusResponse(unsigned char* commandPacketBuffer, unsigned char* responsePacketBuffer, unsigned char linxStatus);
+		void getDeviceID(unsigned char* commandPacketBuffer, unsigned char* responsePacketBuffer);
+		
+		
 	private:
 		/****************************************************************************************
 		**  Variables
 		****************************************************************************************/		
-		int TCPBufIndex;
-		
+				
 		
 		/****************************************************************************************
 		**  Functions
 		****************************************************************************************/
-		int peek(unsigned char * recBuffer, int bufferSize);
+		
 		
 };
 
-#endif //LINX_NETWORKING_H
+
+#endif //LINX_DEVICE_H

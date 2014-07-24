@@ -29,16 +29,6 @@ unsigned long getSeconds()
 	return mTime.tv_sec;
 }
 
-void processCommand(unsigned char recBuffer[], unsigned char sendBuffer[] )
-{
-	debugPrintln("PROCESS COMMAND NOT IMPLEMENTED!!!!");
-	
-	for(int i=0; i< PACKET_BUFFER_SIZE; i++)
-	{
-		sendBuffer[i] = recBuffer[i];
-	}
-}
-
 unsigned char computeChecksum(unsigned char* packetBuffer)
 {  
   unsigned char checksum = 0;

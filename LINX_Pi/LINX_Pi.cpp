@@ -1,4 +1,4 @@
-
+ 
 
 
 /****************************************************************************************
@@ -15,11 +15,13 @@
 #include "LINX_Config.h"
 #include "LINX_Common.h"
 #include "LINX_Networking.h"
+#include "device/LINX_Device.h"
 
 /****************************************************************************************
 ** Variables
 ****************************************************************************************/
 TCPServer LINXServer;
+LINXDevice LINXDev;
 
 int main(int argc, char *argv[])
 {
@@ -47,7 +49,7 @@ int main(int argc, char *argv[])
 				
 			case CONNECTED:
 				debugPrintln("Connected State");
-				LINXServer.checkForPacket();
+				LINXServer.processPackets(LINXDev);
 				break;	
 				
 			case EXIT:

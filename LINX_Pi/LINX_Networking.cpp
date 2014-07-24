@@ -10,6 +10,7 @@
 #include "LINX_Config.h"
 #include "LINX_Common.h"
 #include "LINX_Networking.h"
+#include "device/LINX_Device.h"
 
 /****************************************************************************************
 **  Constructors
@@ -108,7 +109,7 @@ int TCPServer::acceptConnection()
 	return 0;	
 }
 
-int TCPServer::checkForPacket()
+int TCPServer::processPackets(LINXDevice LINXDev)
 {
 	int received = -1;
 	unsigned char packetSize = 0;
@@ -158,7 +159,8 @@ int TCPServer::checkForPacket()
 					if(checksumPassed(recBuffer))
 					{					
 						//Process Packet
-						processCommand(recBuffer, sendBuffer);
+						//TODO processCommand(recBuffer, sendBuffer);
+						LINXDev.processCommand(recBuffer, sendBuffer);
 						
 						//Send Response Packet
 						unsigned char bytesToSend = sendBuffer[1];
