@@ -26,7 +26,7 @@ LINXDevice LINXDev;
 int main(int argc, char *argv[])
 {
 
-	debugPrintln("Starting LVH LINX");
+	debug_Println("Starting LVH LINX");
 	
 	//Start LINX TCP Server
 	
@@ -38,22 +38,28 @@ int main(int argc, char *argv[])
 		switch(LINXServer.state)
 		{
 			case START:
-				debugPrintln("Start State");
+				debug_Println("Start State");
 				LINXServer.begin(6999);
 				break;
 			
 			case LISTENING:
-				debugPrintln("Listening State");
+				debug_Println("Listening State");
 				LINXServer.acceptConnection();
 				break;					
 				
 			case CONNECTED:
-				debugPrintln("Connected State");
+				debug_Println("Connected State");
 				LINXServer.processPackets(LINXDev);
-				break;	
+				break;
+
+			case RESTART:
+				debug_Println("Restarting LINX Server");
+				LINXServer.stop();
+				LINXServer.state = START;
+				break;					
 				
 			case EXIT:
-				debugPrintln("Exit State");
+				debug_Println("Exit State");
 				LINXServer.stop();
 				exit(-1);
 				break;				

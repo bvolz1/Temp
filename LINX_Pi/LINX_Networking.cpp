@@ -28,18 +28,18 @@ TCPServer::TCPServer()
 
 int TCPServer::begin(unsigned int serverPort)
 {
-	debugPrintln("Starting LINX TCP Server!");
+	debug_Println("Starting LINX TCP Server!");
 	
 	//Create the TCP socket
 	if((serversock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0) 
 	{
-		debugPrintln("Failed To Create Socket");
+		debug_Println("Failed To Create Socket");
 		state = EXIT;
 		return -1;
 	}
 	else
 	{
-		debugPrintln("Successfully Created Socket");
+		debug_Println("Successfully Created Socket");
 	}
 	
 	
@@ -53,25 +53,25 @@ int TCPServer::begin(unsigned int serverPort)
 	//Bind the server socket
 	if( bind(serversock, (struct sockaddr *) &echoserver, sizeof(echoserver)) < 0)
 	{
-		debugPrintln("Failed To Bind Sever Socket");
+		debug_Println("Failed To Bind Sever Socket");
 		state = EXIT;
 		return -1;
 	}
 	else
 	{
-		debugPrintln("Successfully Bound Sever Socket");
+		debug_Println("Successfully Bound Sever Socket");
 	}
 	
 	//Listen on the server socket
 	if(listen(serversock, MAX_PENDING_CONS) < 0)
 	{
-		debugPrintln("Failed To Start Listening On Sever Socket");
+		debug_Println("Failed To Start Listening On Sever Socket");
 		state = EXIT;
 		return -1;
 	}
 	else
 	{
-		debugPrintln("Successfully Started Listening On Sever Socket");
+		debug_Println("Successfully Started Listening On Sever Socket");
 		state = LISTENING;
 	}
 	
@@ -80,7 +80,7 @@ int TCPServer::begin(unsigned int serverPort)
 
 int TCPServer::acceptConnection()
 {
-	debugPrintln("Waiting For Client Connection");
+	debug_Println("Waiting For Client Connection");
 	
 	unsigned int clientlen = sizeof(echoclient);
 	
@@ -94,7 +94,7 @@ int TCPServer::acceptConnection()
 	{		
 		if ( setsockopt (clientsock, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout)) < 0)
 		{
-			debugPrintln("Failed To Set Socket Receive Time-out");
+			debug_Println("Failed To Set Socket Receive Time-out");
 			return -1;
 		}
 		else
@@ -102,8 +102,8 @@ int TCPServer::acceptConnection()
 			
 			TCPUpdateTime = getSeconds();
 			state = CONNECTED;
-			debugPrint(inet_ntoa(echoclient.sin_addr));
-			debugPrintln(" Successfully Connected");
+			debug_Print(inet_ntoa(echoclient.sin_addr));
+			debug_Println(" Successfully Connected");
 		}		
 	}
 	return 0;	
@@ -124,8 +124,6 @@ int TCPServer::processPackets(LINXDevice LINXDev)
 	//Wait For At Least First Two Bytes Of Packet
 	if(received >= 2)
 	{
-		fprintf(stdout, "SoF = %d \n", recBuffer[0]);
-		fprintf(stdout, "Len= %d \n", recBuffer[1]);
 		//Check SoF and Packet Size
 		if(recBuffer[0] == 0xFF)
 		{
@@ -136,7 +134,7 @@ int TCPServer::processPackets(LINXDevice LINXDev)
 				//Partial Packet, Make Sure Packet Size Will Fit In Buffer, If It Will Loop To Wait For Remainder Of Packet
 				if(packetSize > PACKET_BUFFER_SIZE)
 				{
-					debugPrintln("Packet Size Too Large For Buffer");
+					debug_Println("Packet Size Too Large For Buffer");
 					state = EXIT;
 					return -1;
 				}				
@@ -148,7 +146,7 @@ int TCPServer::processPackets(LINXDevice LINXDev)
 				if( received = read(clientsock, recBuffer, packetSize) < 0 )
 				{
 					//Failed To Read Packet From Buffer
-					debugPrintln("Failed To Read Packet From Buffer");
+					debug_Println("Failed To Read Packet From Buffer");
 					state = EXIT;
 					return -1;				
 				}
@@ -158,15 +156,18 @@ int TCPServer::processPackets(LINXDevice LINXDev)
 					//Check Checksum
 					if(checksumPassed(recBuffer))
 					{					
-						//Process Packet
-						processCommand(recBuffer, sendBuffer, LINXDev);
-						
+						//Process Packet Handle Any Networking Packets
+						if(processCommand(recBuffer, sendBuffer, LINXDev) == 0x0011)
+						{
+							//Host Disconnected.  Listen For New Connection
+							state = LISTENING;
+						}						
 						
 						//Send Response Packet
 						unsigned char bytesToSend = sendBuffer[1];
 						if( send(clientsock, sendBuffer, bytesToSend, 0) != bytesToSend)
 						{
-							debugPrintln("Failed To Send Response Packet");
+							debug_Println("Failed To Send Response Packet");
 							state = EXIT;
 							return -1;
 						}
@@ -175,7 +176,7 @@ int TCPServer::processPackets(LINXDevice LINXDev)
 					else
 					{
 						//Checksum Failed
-						debugPrintln("Checksum Failed");
+						debug_Println("Checksum Failed");
 						recv(clientsock, recBuffer, PACKET_BUFFER_SIZE, MSG_DONTWAIT);	
 					}
 				}
@@ -184,7 +185,7 @@ int TCPServer::processPackets(LINXDevice LINXDev)
 		else
 		{
 			//Bad SoF, Flush Socket
-			debugPrintln("Bad SoF");
+			debug_Println("Bad SoF");
 			recv(clientsock, recBuffer, PACKET_BUFFER_SIZE, MSG_DONTWAIT);		
 		}
 	}
@@ -209,7 +210,7 @@ int TCPServer::peek(unsigned char * recBuffer, int bufferSize)
 		if(errno  == EWOULDBLOCK)
 		{
 			//Time-out Waiting For Data
-			debugPrintln("Time-out Waiting For Data");			
+			debug_Println("Time-out Waiting For Data");			
 		}			
 		else
 		{
@@ -226,8 +227,8 @@ int TCPServer::peek(unsigned char * recBuffer, int bufferSize)
 	else	 if(peekReceived == 0)
 	{		
 		//Client Disconnected
-		debugPrintln("Client Disconnected");			
-		state = EXIT;		
+		debug_Println("Client Disconnected");			
+		state = LISTENING;		
 	}
 	else
 	{

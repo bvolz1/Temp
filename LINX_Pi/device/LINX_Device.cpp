@@ -8,10 +8,9 @@
 ****************************************************************************************/
 LINXDevice::LINXDevice()
 {
-	unsigned char deviceFamily = 0xFE;
-	unsigned char deviceID = 0x00;		
+	deviceFamily = 0xFE;
+	deviceID = 0x00;		
 }
-
 
 /****************************************************************************************
 **  Functions

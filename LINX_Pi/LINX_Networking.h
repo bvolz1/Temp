@@ -4,7 +4,7 @@
 #include "device/LINX_Device.h"
 
 //Variables
-enum TCPServerState {START, LISTENING, CONNECTED, CLOSE, EXIT};
+enum TCPServerState {START, LISTENING, CONNECTED, RESTART, EXIT};
 
 class TCPServer
 {

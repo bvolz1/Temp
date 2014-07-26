@@ -4,7 +4,7 @@
 #include "LINX_Config.h"
 #include "LINX_Common.h"
 
-void debugPrint(char* message)
+void debug_Print(char* message)
 {
 	if(DEBUG_ENABLED)
 	{
@@ -12,7 +12,7 @@ void debugPrint(char* message)
 	}		
 }
 
-void debugPrintln(char* message)
+void debug_Println(char* message)
 {
 	if(DEBUG_ENABLED)
 	{
@@ -53,9 +53,9 @@ void statusResponse(unsigned char* commandPacketBuffer, unsigned char* responseP
 }
 
 
-void processCommand(unsigned char* commandPacketBuffer, unsigned char* responsePacketBuffer, LINXDevice LINXDev)
+int processCommand(unsigned char* commandPacketBuffer, unsigned char* responsePacketBuffer, LINXDevice LINXDev)
 {
-	debugPrintln("LINXDev Processing Command ");
+	debug_printCmdPacket(commandPacketBuffer);
 		
 	//Store Some Local Values For Convenience
 	unsigned char commandLength = commandPacketBuffer[1];
@@ -76,23 +76,55 @@ void processCommand(unsigned char* commandPacketBuffer, unsigned char* responseP
 		packetize(commandPacketBuffer, responsePacketBuffer, 2, OK); 
 		break;	
 		
+	case 0x0011: // Disconnect
+		//Nothing To Do Here.  This Function Will Return CMD To Network Stack Which Will Drop The Connection
+		break;
+		
 	default: //Default Case
 		statusResponse(commandPacketBuffer, responsePacketBuffer, FUNCTION_NOT_SUPPORTED);
 		break;		
 	}
+	debug_printResPacket(responsePacketBuffer);
+	return command;
 }
-
 
 
 void packetize(unsigned char* commandPacketBuffer, unsigned char* responsePacketBuffer, unsigned int dataSize, LINXStatus status)
 {
 	//Load Header
 	responsePacketBuffer[0] = 0xFF;                                 //SoF
-	responsePacketBuffer[1] = 0x08;                                //PACKET SIZE
+	responsePacketBuffer[1] = dataSize+6; 						//PACKET SIZE
 	responsePacketBuffer[2] = commandPacketBuffer[2];	//PACKET NUM (MSB)
 	responsePacketBuffer[3] = commandPacketBuffer[3];	//PACKET NUM (LSB)
 	responsePacketBuffer[4] = status;								//Status
 	
 	//Compute And Load Checksum
 	responsePacketBuffer[dataSize+5] = computeChecksum(responsePacketBuffer);	
+}
+
+
+void debug_printCmdPacket(unsigned char* packetBuffer)
+{
+	if(DEBUG_ENABLED)
+	{	
+		fprintf(stdout, "Received : ");		
+		for(int i =0; i<packetBuffer[1]; i++)
+		{
+			fprintf(stdout, "[%X] ", packetBuffer[i]);
+		}	
+		fprintf(stdout, "\n");
+	}	
+}
+
+void debug_printResPacket(unsigned char* packetBuffer)
+{
+	if(DEBUG_ENABLED)
+	{	
+		fprintf(stdout, "Replying With : ");
+		for(int i=0; i<packetBuffer[1]; i++)
+		{
+			fprintf(stdout, "[%X] ", packetBuffer[i]);
+		}	
+		fprintf(stdout, "\n");
+	}		
 }
