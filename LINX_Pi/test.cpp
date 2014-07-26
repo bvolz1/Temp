@@ -1,18 +1,16 @@
 #include <stdio.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <netinet/in.h>
 
-#include "LINX_Common.h"
+#ifndef NUMBER
+#define NUMBER 10
+#endif
 
-/****************************************************************************************
-** Variables
-****************************************************************************************/
-
-
-int main(int argc, char *argv[])
+int main()
 {
-
-	//debugPrint("Starting LVH LINX");
-	while(1)
-	{
-		getTicks();
-	}
+	fprintf(stdout, "hello   %d \n", NUMBER);
 }

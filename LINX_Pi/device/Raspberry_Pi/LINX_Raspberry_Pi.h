@@ -1,28 +1,27 @@
-#ifndef LINX_DEVICE_H
-#define LINX_DEVICE_H
+#ifndef LINX_RASPBERRY_PI_H
+#define LINX_RASPBERRY_PI_H
 
-#include "LINX_Device_Config.h"
+/****************************************************************************************
+**  Includes
+****************************************************************************************/		
+#include "../LINX_Device.h"
+#include "LINX_Raspberry_Pi_Config.h"
 
-class LINXDevice
+/****************************************************************************************
+**  Defines
+****************************************************************************************/		
+
+class LINXRaspberryPi : public LINXDevice
 {
 	public:	
 		/****************************************************************************************
 		**  Variables
 		****************************************************************************************/		
-		unsigned char deviceFamily;
-		unsigned char deviceID;
-		
-		//----Peripherals----
-		
-		//DIO		
-		unsigned char numDIOChans;
-		unsigned char DIOChans[NUMDIOCHANS];
-
-		
+				
 		/****************************************************************************************
 		**  Constructors
 		****************************************************************************************/
-		LINXDevice();
+		LINXRaspberryPi();
 			
 		/****************************************************************************************
 		**  Functions
@@ -42,4 +41,4 @@ class LINXDevice
 };
 
 
-#endif //LINX_DEVICE_H
+#endif //LINX_RASPBERRY_PI_H

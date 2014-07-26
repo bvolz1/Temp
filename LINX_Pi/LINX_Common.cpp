@@ -76,6 +76,10 @@ int processCommand(unsigned char* commandPacketBuffer, unsigned char* responsePa
 		packetize(commandPacketBuffer, responsePacketBuffer, 2, OK); 
 		break;	
 		
+	case 0x0008: // Get DIO Channels
+		
+		break;
+		
 	case 0x0011: // Disconnect
 		//Nothing To Do Here.  This Function Will Return CMD To Network Stack Which Will Drop The Connection
 		break;
