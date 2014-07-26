@@ -12,7 +12,6 @@ void debugPrint(char* message)
 	}		
 }
 
-
 void debugPrintln(char* message)
 {
 	if(DEBUG_ENABLED)
@@ -45,4 +44,55 @@ unsigned char computeChecksum(unsigned char* packetBuffer)
 bool checksumPassed(unsigned char* packetBuffer)
 {
   return (computeChecksum(packetBuffer) == packetBuffer[packetBuffer[1]-1]);
+}
+
+
+void statusResponse(unsigned char* commandPacketBuffer, unsigned char* responsePacketBuffer, LINXStatus status)
+{
+	packetize(commandPacketBuffer, responsePacketBuffer, 0, status); 
+}
+
+
+void processCommand(unsigned char* commandPacketBuffer, unsigned char* responsePacketBuffer, LINXDevice LINXDev)
+{
+	debugPrintln("LINXDev Processing Command ");
+		
+	//Store Some Local Values For Convenience
+	unsigned char commandLength = commandPacketBuffer[1];
+	unsigned int command = commandPacketBuffer[4] << 8 | commandPacketBuffer[5];
+	
+	switch(command)
+  {
+    /************************************************************************************
+    * SYSTEM COMMANDS
+    ************************************************************************************/
+	case 0x0000: // Sync Packet        
+		statusResponse(commandPacketBuffer, responsePacketBuffer, OK);
+		break;
+	 
+	case 0x0003: // Get Device ID     
+		responsePacketBuffer[5] = LINXDev.deviceFamily;
+		responsePacketBuffer[6] = LINXDev.deviceID;    
+		packetize(commandPacketBuffer, responsePacketBuffer, 2, OK); 
+		break;	
+		
+	default: //Default Case
+		statusResponse(commandPacketBuffer, responsePacketBuffer, FUNCTION_NOT_SUPPORTED);
+		break;		
+	}
+}
+
+
+
+void packetize(unsigned char* commandPacketBuffer, unsigned char* responsePacketBuffer, unsigned int dataSize, LINXStatus status)
+{
+	//Load Header
+	responsePacketBuffer[0] = 0xFF;                                 //SoF
+	responsePacketBuffer[1] = 0x08;                                //PACKET SIZE
+	responsePacketBuffer[2] = commandPacketBuffer[2];	//PACKET NUM (MSB)
+	responsePacketBuffer[3] = commandPacketBuffer[3];	//PACKET NUM (LSB)
+	responsePacketBuffer[4] = status;								//Status
+	
+	//Compute And Load Checksum
+	responsePacketBuffer[dataSize+5] = computeChecksum(responsePacketBuffer);	
 }

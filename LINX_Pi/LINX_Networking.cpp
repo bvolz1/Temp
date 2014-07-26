@@ -159,8 +159,8 @@ int TCPServer::processPackets(LINXDevice LINXDev)
 					if(checksumPassed(recBuffer))
 					{					
 						//Process Packet
-						//TODO processCommand(recBuffer, sendBuffer);
-						LINXDev.processCommand(recBuffer, sendBuffer);
+						processCommand(recBuffer, sendBuffer, LINXDev);
+						
 						
 						//Send Response Packet
 						unsigned char bytesToSend = sendBuffer[1];

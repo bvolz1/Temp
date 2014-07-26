@@ -8,8 +8,8 @@ class LINXDevice
 		/****************************************************************************************
 		**  Variables
 		****************************************************************************************/		
-		unsigned char familyCode;
-		unsigned char deviceCode;
+		unsigned char deviceFamily;
+		unsigned char deviceID;
 		
 		/****************************************************************************************
 		**  Constructors
@@ -19,10 +19,6 @@ class LINXDevice
 		/****************************************************************************************
 		**  Functions
 		****************************************************************************************/
-		void processCommand(unsigned char* commandPacketBuffer, unsigned char* responsePacketBuffer);
-		void statusResponse(unsigned char* commandPacketBuffer, unsigned char* responsePacketBuffer, unsigned char linxStatus);
-		void getDeviceID(unsigned char* commandPacketBuffer, unsigned char* responsePacketBuffer);
-		
 		
 	private:
 		/****************************************************************************************
