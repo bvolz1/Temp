@@ -76,12 +76,23 @@ int processCommand(unsigned char* commandPacketBuffer, unsigned char* responsePa
 		packetize(commandPacketBuffer, responsePacketBuffer, 2, OK); 
 		break;	
 		
-	case 0x0008: // Get DIO Channels
+	case 0x0004: //Get LINX API Version
+		responsePacketBuffer[5] = LINXDev.linxAPIMajor;
+		responsePacketBuffer[6] = LINXDev.linxAPIMinor;
+		responsePacketBuffer[7] = LINXDev.linxAPISubminor;   
+		packetize(commandPacketBuffer, responsePacketBuffer, 3, OK); 
+		break;
 		
+	case 0x0008: // Get DIO Channels
+		dataBufferResponse(commandPacketBuffer, responsePacketBuffer, LINXDev.DIOChans, LINXDev.numDIOChans, OK);
 		break;
 		
 	case 0x0011: // Disconnect
 		//Nothing To Do Here.  This Function Will Return CMD To Network Stack Which Will Drop The Connection
+		break;
+		
+	case 0x0024: // Get Device Name
+		dataBufferResponse(commandPacketBuffer, responsePacketBuffer, LINXDev.deviceName, LINXDev.deviceNameLen, OK);
 		break;
 		
 	default: //Default Case
@@ -131,4 +142,17 @@ void debug_printResPacket(unsigned char* packetBuffer)
 		}	
 		fprintf(stdout, "\n");
 	}		
+}
+
+
+void dataBufferResponse(unsigned char* commandPacketBuffer, unsigned char* responsePacketBuffer, const unsigned char* dataBuffer, unsigned char dataSize, LINXStatus status)
+{
+	fprintf(stdout, "Name Size = %d", dataSize);
+	//Copy Data Into Response Buffer
+	for(int i=0; i<dataSize; i++)
+	{
+		responsePacketBuffer[i+5] = dataBuffer[i];
+	}
+	
+	packetize(commandPacketBuffer, responsePacketBuffer, dataSize, status);
 }

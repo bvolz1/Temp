@@ -1,26 +1,40 @@
-#ifndef LINX_RASPBERRY_PI_H
-#define LINX_RASPBERRY_PI_H
+#ifndef LINX_RASPBERRY_PI_B_H
+#define LINX_RASPBERRY_PI_B_H
 
 /****************************************************************************************
 **  Includes
 ****************************************************************************************/		
-#include "../LINX_Device.h"
+#include "LINX_Raspberry_Pi.h"
 
 /****************************************************************************************
 **  Defines
 ****************************************************************************************/		
-
-class LINXRaspberryPi : public LINXDevice
+#define DEVICE_FAMILY 0x04
+#define DEVICE_ID 0x01
+#define DEVICENAMELEN 20
+#define LINX_API_MAJOR 1
+#define LINX_API_MINOR 1
+#define LINX_API_SUBMINOR 0
+#define NUMDIOCHANS 17
+		
+/****************************************************************************************
+**  Variables
+****************************************************************************************/		
+const unsigned char c_deviceName[DEVICENAMELEN] = {'R', 'a', 's', 'p', 'b', 'e', 'r', 'r', 'y', ' ', 'P', 'i', ' ', 'M', 'o', 'd', 'e', 'l', ' ', 'B'};
+const unsigned char c_DIOChans[NUMDIOCHANS] = {2, 3, 4, 7, 8, 9, 10, 11, 14, 15, 17, 18, 22, 23, 24, 25, 27};
+		
+class LINXRaspberryPi_B : public LINXRaspberryPi
 {
 	public:	
 		/****************************************************************************************
 		**  Variables
 		****************************************************************************************/		
 				
+		//End Model B		
 		/****************************************************************************************
 		**  Constructors
 		****************************************************************************************/
-		LINXRaspberryPi();
+		LINXRaspberryPi_B();
 			
 		/****************************************************************************************
 		**  Functions
@@ -40,4 +54,4 @@ class LINXRaspberryPi : public LINXDevice
 };
 
 
-#endif //LINX_RASPBERRY_PI_H
+#endif //LINX_RASPBERRY_PI_B_H

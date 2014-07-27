@@ -1,7 +1,4 @@
- 
-
-
-/****************************************************************************************
+ /****************************************************************************************
 **  Includes
 ****************************************************************************************/
 #include <stdio.h>
@@ -17,13 +14,13 @@
 #include "LINX_Networking.h"
 #include "device/LINX_Device.h"
 
-#include "device/Raspberry_Pi/LINX_Raspberry_Pi.h"
+#include "device/Raspberry_Pi/LINX_Raspberry_Pi_B.h"
 
 /****************************************************************************************
 ** Variables
 ****************************************************************************************/
 TCPServer LINXServer;
-LINXRaspberryPi LINXDev;
+LINXRaspberryPi_B LINXDev;
 
 int main(int argc, char *argv[])
 {

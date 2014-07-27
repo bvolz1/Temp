@@ -1,22 +1,28 @@
 #ifndef LINX_DEVICE_H
 #define LINX_DEVICE_H
 
-#include "LINX_Device_Config.h"
-
 class LINXDevice
 {
 	public:	
 		/****************************************************************************************
 		**  Variables
 		****************************************************************************************/		
+		//Device ID
 		unsigned char deviceFamily;
 		unsigned char deviceID;
+		unsigned char deviceNameLen;
+		const unsigned char* deviceName;
+		
+		//LINX API Version
+		unsigned char linxAPIMajor;
+		unsigned char linxAPIMinor;
+		unsigned char linxAPISubminor;
 		
 		//----Peripherals----
 		
 		//DIO		
 		unsigned char numDIOChans;
-		unsigned char DIOChans[NUMDIOCHANS];
+		const unsigned char*  DIOChans;
 
 		
 		/****************************************************************************************
