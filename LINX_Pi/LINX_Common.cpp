@@ -86,6 +86,38 @@ int processCommand(unsigned char* commandPacketBuffer, unsigned char* responsePa
 	case 0x0008: // Get DIO Channels
 		dataBufferResponse(commandPacketBuffer, responsePacketBuffer, LINXDev.DIOChans, LINXDev.numDIOChans, OK);
 		break;
+	
+	case 0x0009: // Get AI Channels
+        dataBufferResponse(commandPacketBuffer, responsePacketBuffer, LINXDev.AIChans, LINXDev.numAIChans, OK);
+       break;
+	   
+    case 0x000A: // Get AO Channels
+        dataBufferResponse(commandPacketBuffer, responsePacketBuffer, LINXDev.AOChans, LINXDev.numAOChans, OK);
+       break;
+	   
+    case 0x000B: // Get PWM Channels
+        dataBufferResponse(commandPacketBuffer, responsePacketBuffer, LINXDev.PWMChans, LINXDev.numPWMChans, OK);
+       break;
+	   
+    case 0x000C: // Get QE Channels
+        dataBufferResponse(commandPacketBuffer, responsePacketBuffer, LINXDev.QEChans, LINXDev.numQEChans, OK);
+       break;
+	   
+    case 0x000D: // Get UART Channels
+       dataBufferResponse(commandPacketBuffer, responsePacketBuffer, LINXDev.UARTChans, LINXDev.numUARTChans, OK);
+       break;
+	   
+    case 0x000E: // Get I2C Channels
+       dataBufferResponse(commandPacketBuffer, responsePacketBuffer, LINXDev.I2CChans, LINXDev.numI2CChans, OK);
+       break;
+	   
+    case 0x000F: // Get SPI Channels
+       dataBufferResponse(commandPacketBuffer, responsePacketBuffer, LINXDev.SPIChans, LINXDev.numSPIChans, OK);
+       break;
+	   
+    case 0x0010: // Get CAN Channels
+        dataBufferResponse(commandPacketBuffer, responsePacketBuffer, LINXDev.CANChans, LINXDev.numCANChans, OK);
+       break;
 		
 	case 0x0011: // Disconnect
 		//Nothing To Do Here.  This Function Will Return CMD To Network Stack Which Will Drop The Connection
@@ -93,6 +125,17 @@ int processCommand(unsigned char* commandPacketBuffer, unsigned char* responsePa
 		
 	case 0x0024: // Get Device Name
 		dataBufferResponse(commandPacketBuffer, responsePacketBuffer, LINXDev.deviceName, LINXDev.deviceNameLen, OK);
+		break;
+		
+	/****************************************************************************************
+	**  Analog I/O
+	****************************************************************************************/	
+	case 0x0061: // Get Device Name
+		responsePacketBuffer[5] = (LINXDev.AIRef>>24) & 0xFF;		//AIREF MSB
+		responsePacketBuffer[6] = (LINXDev.AIRef>>16) & 0xFF;		//...
+		responsePacketBuffer[7] = (LINXDev.AIRef>>8) & 0xFF;			//...
+		responsePacketBuffer[8] = LINXDev.AIRef & 0xFF;					//AIREF LSB
+		packetize(commandPacketBuffer, responsePacketBuffer, 4, OK); 
 		break;
 		
 	default: //Default Case

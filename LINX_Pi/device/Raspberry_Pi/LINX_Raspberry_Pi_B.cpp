@@ -19,6 +19,40 @@ LINXRaspberryPi_B::LINXRaspberryPi_B()
 	//DIOChans;	
 	numDIOChans = NUMDIOCHANS;
 	DIOChans = c_DIOChans;
+	
+	//AI
+	numAIChans = NUMAICHANS;
+	AIChans = c_AIChans;
+	AIResolution = AI_RESOLUTION;
+	AIRef = AI_REFERENCE;
+	
+	//AO
+	numAOChans = NUMAOCHANS;
+	AOChans = c_AOChans;
+	
+	//PWM
+	numPWMChans = NUMPWMCHANS;
+	PWMChans = c_PWMChans;
+	
+	//QE
+	numQEChans = NUMQECHANS;
+	QEChans = c_QEChans;
+	
+	//UART
+	numUARTChans = NUMUARTCHANS;
+	UARTChans = c_UARTChans;
+	
+	//I2C
+	numI2CChans = NUMI2CCHANS;
+	I2CChans = c_I2CChans;
+	
+	//SPI
+	numSPIChans = NUMSPICHANS;
+	SPIChans = c_SPIChans;
+	
+	//CAN
+	numCANChans = NUMCANCHANS;
+	CANChans = c_CANChans;
 }
 
 /****************************************************************************************

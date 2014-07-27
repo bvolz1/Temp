@@ -9,11 +9,25 @@
 LINXDevice::LINXDevice()
 {
 	deviceFamily = 0xFE;
-	deviceID = 0x00;	
+	deviceID = 0x00;
 }
 
 /****************************************************************************************
 **  Functions
 ****************************************************************************************/
 
+//Digital I/O
+void LINXDevice::pinMode()
+{
+	
+}
 
+void LINXDevice::digitalWrite()
+{
+	
+}
+
+unsigned char LINXDevice::digitalRead()
+{
+	
+}
