@@ -14,18 +14,22 @@
 #include "LINX_Networking.h"
 #include "device/LINX_Device.h"
 
-#include "device/Raspberry_Pi/LINX_Raspberry_Pi_B.h"
+#include "device/Raspberry_Pi/LINX_Raspberry_Pi.h"
 
 /****************************************************************************************
 ** Variables
 ****************************************************************************************/
 TCPServer LINXServer;
-LINXRaspberryPi_B LINXDev;
-
 int main(int argc, char *argv[])
 {
+	LINXRaspberryPi LINXDev(MODEL_A);
 
-	debug_Println("Starting LVH LINX");
+	debug_Print("/nStarting LVH LINX On ");
+	for(int i=0; i<LINXDev.deviceNameLen; i++)
+	{
+		fprintf(stdout, "%d ", LINXDev.deviceName[i]);
+	}
+	
 	
 	//Start LINX TCP Server
 	

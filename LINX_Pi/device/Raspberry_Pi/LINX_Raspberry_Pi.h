@@ -7,9 +7,9 @@
 #include "../LINX_Device.h"
 
 /****************************************************************************************
-**  Defines
+**  Variables
 ****************************************************************************************/		
-#define DEVICE_FAMILY 0x04
+enum RaspberryPiDevice {MODEL_A, MODEL_B, MODEL_B_PLUS};
 
 class LINXRaspberryPi : public LINXDevice
 {
@@ -21,7 +21,7 @@ class LINXRaspberryPi : public LINXDevice
 		/****************************************************************************************
 		**  Constructors
 		****************************************************************************************/
-		LINXRaspberryPi();
+		LINXRaspberryPi(RaspberryPiDevice deviceType);
 			
 		/****************************************************************************************
 		**  Functions
