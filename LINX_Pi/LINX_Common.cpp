@@ -1,25 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include "LINX_Config.h"
 #include "LINX_Common.h"
-
-void debug_Print(char* message)
-{
-	if(DEBUG_ENABLED)
-	{
-		fprintf(stdout, message);
-	}		
-}
-
-void debug_Println(char* message)
-{
-	if(DEBUG_ENABLED)
-	{
-		fprintf(stdout, message);
-		fprintf(stdout, "\n");
-	}		
-}
 
 unsigned long getSeconds()
 {
@@ -55,7 +37,7 @@ void statusResponse(unsigned char* commandPacketBuffer, unsigned char* responseP
 
 int processCommand(unsigned char* commandPacketBuffer, unsigned char* responsePacketBuffer, LINXDevice LINXDev)
 {
-	debug_printCmdPacket(commandPacketBuffer);
+	DEBUGCMDPACKET(commandPacketBuffer);
 		
 	//Store Some Local Values For Convenience
 	unsigned char commandLength = commandPacketBuffer[1];
@@ -142,7 +124,7 @@ int processCommand(unsigned char* commandPacketBuffer, unsigned char* responsePa
 		statusResponse(commandPacketBuffer, responsePacketBuffer, FUNCTION_NOT_SUPPORTED);
 		break;		
 	}
-	debug_printResPacket(responsePacketBuffer);
+	DEBUGRESPACKET(responsePacketBuffer);
 	return command;
 }
 
@@ -160,33 +142,29 @@ void packetize(unsigned char* commandPacketBuffer, unsigned char* responsePacket
 	responsePacketBuffer[dataSize+5] = computeChecksum(responsePacketBuffer);	
 }
 
-
-void debug_printCmdPacket(unsigned char* packetBuffer)
-{
-	if(DEBUG_ENABLED)
-	{	
+#ifdef DEBUG_ENABLED
+	void DEBUGCMDPACKET(unsigned char* packetBuffer)
+	{
 		fprintf(stdout, "Received : ");		
 		for(int i =0; i<packetBuffer[1]; i++)
 		{
 			fprintf(stdout, "[%X] ", packetBuffer[i]);
 		}	
 		fprintf(stdout, "\n");
-	}	
-}
+	}
+#endif //DEBUG_ENABLED
 
+#ifdef DEBUG_ENABLED
 void debug_printResPacket(unsigned char* packetBuffer)
 {
-	if(DEBUG_ENABLED)
-	{	
-		fprintf(stdout, "Replying With : ");
-		for(int i=0; i<packetBuffer[1]; i++)
-		{
-			fprintf(stdout, "[%X] ", packetBuffer[i]);
-		}	
-		fprintf(stdout, "\n");
-	}		
+	fprintf(stdout, "Replying With : ");
+	for(int i=0; i<packetBuffer[1]; i++)
+	{
+		fprintf(stdout, "[%X] ", packetBuffer[i]);
+	}	
+	fprintf(stdout, "\n");
 }
-
+#endif //DEBUG_ENABLED
 
 void dataBufferResponse(unsigned char* commandPacketBuffer, unsigned char* responsePacketBuffer, const unsigned char* dataBuffer, unsigned char dataSize, LINXStatus status)
 {

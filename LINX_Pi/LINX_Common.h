@@ -1,6 +1,19 @@
 #ifndef LINX_COMMON_H
 #define LINX_COMMON_H
 
+/****************************************************************************************
+** Defines
+****************************************************************************************/
+#ifdef DEBUG_ENABLED
+	#define DEBUG(x) fprintf(stdout, x);fprintf(stdout, "\n")
+	#define DEBUGCMDPACKET(x) debug_printCmdPacket(x)
+	#define DEBUGRESPACKET(x) debug_printResPacket(x)
+#else
+	#define DEBUG(x) do {} while (0)									//Compile Out
+	#define DEBUGCMDPACKET(x) do {} while (0)					//Compile Out
+	#define DEBUGRESPACKET(x) do {} while (0)					//Compile Out
+#endif	//DEBUG_ENABLED
+
 #include "device/LINX_Device.h"
 
 /****************************************************************************************

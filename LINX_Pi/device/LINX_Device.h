@@ -11,7 +11,7 @@ class LINXDevice
 		unsigned char deviceFamily;
 		unsigned char deviceID;
 		unsigned char deviceNameLen;
-		unsigned char* deviceName;
+		const unsigned char* deviceName;
 		
 		//LINX API Version
 		unsigned char linxAPIMajor;
@@ -70,10 +70,7 @@ class LINXDevice
 		****************************************************************************************/
 		
 		//Digital I/O
-		void pinMode();
-		void digitalWrite();
-		unsigned char digitalRead();
-		
+				
 	private:
 		/****************************************************************************************
 		**  Variables

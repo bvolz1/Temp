@@ -3,6 +3,14 @@
 #define LINX_NETWORKING_H
 #include "device/LINX_Device.h"
 
+#ifndef PACKET_BUFFER_SIZE
+	#define PACKET_BUFFER_SIZE 64
+#endif
+
+#ifndef MAX_PENDING_CONS
+	#define MAX_PENDING_CONS 2
+#endif
+
 //Variables
 enum TCPServerState {START, LISTENING, CONNECTED, RESTART, EXIT};
 
