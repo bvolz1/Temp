@@ -29,9 +29,8 @@ LINXRaspberryPi_B LINXDev;
 int main(int argc, char *argv[])
 {
 
-
+	DEBUG("\nStarting LVH LINX Daemon...");
 	
-	DEBUG("\nStarting LVH LINX On");
 	//Start LINX TCP Server	
 	while(1)
 	{	

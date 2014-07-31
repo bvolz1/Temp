@@ -5,7 +5,14 @@
 #include "../LINX_Device.h"
 #include "LINX_Raspberry_Pi_B.h"
 
-#define DEVICENAMELEN 20
+#include <stdio.h>
+#include <string.h>
+
+/****************************************************************************************
+**  Member Variables
+****************************************************************************************/
+const unsigned char LINXRaspberryPi_B::m_deviceName[DEVICE_NAME_LEN] = {'R', 'a', 's', 'p', 'b', 'e', 'r', 'r', 'y', ' ', 'P', 'i', ' ', 'M', 'o', 'd', 'e', 'l', ' ', 'B'};
+const unsigned char LINXRaspberryPi_B::m_DIOChans[NUM_DIO_CHANS] = {2, 3, 4, 7, 8, 9, 10, 11, 14, 15, 17, 18, 22, 23, 24, 25, 27};
 
 /****************************************************************************************
 **  Constructors
@@ -14,19 +21,17 @@ LINXRaspberryPi_B::LINXRaspberryPi_B()
 {
 	//Set Raspberry Pi Family And Model Number	
 	deviceID = 0x01;
-	deviceNameLen = 20;
-	const unsigned char m_deviceName[20] = {'R', 'a', 's', 'p', 'b', 'e', 'r', 'r', 'y', ' ', 'P', 'i', ' ', 'M', 'o', 'd', 'e', 'l', ' ', 'B'};
+	deviceNameLen = DEVICE_NAME_LEN;	 
 	deviceName =  m_deviceName;
-	
+
 	//LINX API Version
 	linxAPIMajor = 1;
 	linxAPIMinor = 1;
 	linxAPISubminor = 0;
 	
 	//DIOChans;	
-	numDIOChans = 17;	
-	const unsigned char DIOChans_B[17] = {2, 3, 4, 7, 8, 9, 10, 11, 14, 15, 17, 18, 22, 23, 24, 25, 27};	
-	DIOChans = DIOChans_B;			
+	numDIOChans = NUM_DIO_CHANS;			
+	DIOChans = m_DIOChans;
 	
 	//AI
 	numAIChans = 0;

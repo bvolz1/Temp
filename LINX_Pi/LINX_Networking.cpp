@@ -19,6 +19,8 @@ TCPServer::TCPServer()
 	state = START;
 	timeout.tv_sec = 10;		//Set Socket Time-out To Default Value
 	TCPBufIndex = 0;
+	
+	
 }
 
 /****************************************************************************************
@@ -109,7 +111,7 @@ int TCPServer::acceptConnection()
 }
 
 int TCPServer::processPackets(LINXDevice LINXDev)
-{
+{	
 	int received = -1;
 	unsigned char packetSize = 0;
 	errno = 0;

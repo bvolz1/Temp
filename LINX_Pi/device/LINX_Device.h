@@ -58,7 +58,6 @@ class LINXDevice
 		unsigned char numCANChans;
 		const unsigned char* CANChans;
 
-
 		
 		/****************************************************************************************
 		**  Constructors

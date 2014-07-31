@@ -112,7 +112,7 @@ int processCommand(unsigned char* commandPacketBuffer, unsigned char* responsePa
 	/****************************************************************************************
 	**  Analog I/O
 	****************************************************************************************/	
-	case 0x0061: // Get Device Name
+	case 0x0061: // Get AI Reference Voltage
 		responsePacketBuffer[5] = (LINXDev.AIRef>>24) & 0xFF;		//AIREF MSB
 		responsePacketBuffer[6] = (LINXDev.AIRef>>16) & 0xFF;		//...
 		responsePacketBuffer[7] = (LINXDev.AIRef>>8) & 0xFF;			//...
@@ -168,7 +168,7 @@ void debug_printResPacket(unsigned char* packetBuffer)
 
 void dataBufferResponse(unsigned char* commandPacketBuffer, unsigned char* responsePacketBuffer, const unsigned char* dataBuffer, unsigned char dataSize, LINXStatus status)
 {
-	fprintf(stdout, "Name Size = %d", dataSize);
+	
 	//Copy Data Into Response Buffer
 	for(int i=0; i<dataSize; i++)
 	{
