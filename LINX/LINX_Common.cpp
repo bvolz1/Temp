@@ -3,6 +3,8 @@
 #include <time.h>
 #include "LINX_Common.h"
 
+#include "device/LINX_Device.h"
+
 unsigned long getSeconds()
 {
 	timespec mTime;
@@ -35,7 +37,7 @@ void statusResponse(unsigned char* commandPacketBuffer, unsigned char* responseP
 }
 
 
-int processCommand(unsigned char* commandPacketBuffer, unsigned char* responsePacketBuffer, LINXDevice LINXDev)
+int processCommand(unsigned char* commandPacketBuffer, unsigned char* responsePacketBuffer, LINXDevice &LINXDev)
 {
 	DEBUGCMDPACKET(commandPacketBuffer);
 		
@@ -107,6 +109,14 @@ int processCommand(unsigned char* commandPacketBuffer, unsigned char* responsePa
 		
 	case 0x0024: // Get Device Name
 		dataBufferResponse(commandPacketBuffer, responsePacketBuffer, LINXDev.deviceName, LINXDev.deviceNameLen, OK);
+		break;
+	
+	/****************************************************************************************
+	**  Digital I/O
+	****************************************************************************************/	
+	case 0x0041: // Get Device Name
+		LINXDev.digitalWrite(commandPacketBuffer[6], &commandPacketBuffer[7], &commandPacketBuffer[7+commandPacketBuffer[6]]);
+		statusResponse(commandPacketBuffer, responsePacketBuffer, OK);
 		break;
 		
 	/****************************************************************************************

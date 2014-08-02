@@ -110,7 +110,7 @@ int TCPServer::acceptConnection()
 	return 0;	
 }
 
-int TCPServer::processPackets(LINXDevice LINXDev)
+int TCPServer::processPackets(LINXDevice &LINXDev)
 {	
 	int received = -1;
 	unsigned char packetSize = 0;
@@ -158,11 +158,14 @@ int TCPServer::processPackets(LINXDevice LINXDev)
 					if(checksumPassed(recBuffer))
 					{					
 						//Process Packet Handle Any Networking Packets
-						if(processCommand(recBuffer, sendBuffer, LINXDev) == 0x0011)
+						unsigned int status = processCommand(recBuffer, sendBuffer, LINXDev);
+						if(status == 0x0011)
 						{
-							//Host Disconnected.  Listen For New Connection
+							//Host Disconnected.  Listen For New Connection														
 							state = LISTENING;
-						}						
+							
+						}	
+										
 						
 						//Send Response Packet
 						unsigned char bytesToSend = sendBuffer[1];

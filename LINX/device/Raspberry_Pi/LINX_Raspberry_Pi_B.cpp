@@ -6,7 +6,7 @@
 #include "LINX_Raspberry_Pi_B.h"
 
 #include <stdio.h>
-#include <string.h>
+#include <string>
 
 /****************************************************************************************
 **  Member Variables
@@ -15,7 +15,7 @@ const unsigned char LINXRaspberryPi_B::m_deviceName[DEVICE_NAME_LEN] = {'R', 'a'
 const unsigned char LINXRaspberryPi_B::m_DIOChans[NUM_DIO_CHANS] = {2, 3, 4, 7, 8, 9, 10, 11, 14, 15, 17, 18, 22, 23, 24, 25, 27};
 
 /****************************************************************************************
-**  Constructors
+**  Constructors /  Destructor
 ****************************************************************************************/
 LINXRaspberryPi_B::LINXRaspberryPi_B()
 {
@@ -69,6 +69,17 @@ LINXRaspberryPi_B::LINXRaspberryPi_B()
 	//CAN
 	numCANChans = 0;
 	CANChans = 0;
+	
+	
+	//Export GPIO
+	GPIOExport(DIOChans, numDIOChans);
+}
+
+//Destructor
+LINXRaspberryPi_B::~LINXRaspberryPi_B()
+{
+	//Unexport GPIO
+	GPIOUnexport(DIOChans, numDIOChans);
 }
 
 /****************************************************************************************

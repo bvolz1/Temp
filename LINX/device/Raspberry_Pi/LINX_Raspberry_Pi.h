@@ -25,12 +25,22 @@ class LINXRaspberryPi : public LINXDevice
 		/****************************************************************************************
 		**  Functions
 		****************************************************************************************/
+		//Member Functions
+		int GPIOExport(const unsigned char*  GPIOChans, const unsigned char numGPIOChans);
+		int GPIOUnexport(const unsigned char*  GPIOChans, const unsigned char numGPIOChans);
+		int GPIOSetDir(unsigned char pin, unsigned char mode);
+		//Read
+		int GPIOWrite(unsigned char pin, unsigned char val);
+				
+		//  Base Class Override Functions
+		int digitalWrite(unsigned char numPins, unsigned char* pins, unsigned char* values);
+		
 		
 	private:
 		/****************************************************************************************
 		**  Variables
 		****************************************************************************************/		
-				
+		
 		
 		/****************************************************************************************
 		**  Functions

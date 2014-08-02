@@ -45,7 +45,7 @@ class TCPServer
 		****************************************************************************************/
 		int begin(unsigned int serverPort);
 		int acceptConnection();
-		int processPackets(LINXDevice LINXDev);
+		int processPackets(LINXDevice &LINXDev);
 		int stop();
 	
 	private:

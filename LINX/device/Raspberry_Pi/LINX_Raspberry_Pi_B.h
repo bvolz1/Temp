@@ -23,9 +23,11 @@ class LINXRaspberryPi_B : public LINXRaspberryPi
 		static const unsigned char m_DIOChans[NUM_DIO_CHANS];
 		
 		/****************************************************************************************
-		**  Constructors
+		**  Constructors /  Destructor
 		****************************************************************************************/
 		LINXRaspberryPi_B();
+		
+		~LINXRaspberryPi_B();
 			
 		/****************************************************************************************
 		**  Functions
