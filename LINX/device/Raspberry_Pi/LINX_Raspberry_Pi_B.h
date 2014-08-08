@@ -8,6 +8,8 @@
 #define DEVICE_NAME_LEN 20
 #define NUM_DIO_CHANS 17
 
+#define NUM_SPI_CHANS 1
+
 /****************************************************************************************
 **  Includes
 ****************************************************************************************/		
@@ -19,8 +21,16 @@ class LINXRaspberryPi_B : public LINXRaspberryPi
 		/****************************************************************************************
 		**  Variables
 		****************************************************************************************/		
+		//System
 		static const unsigned char m_deviceName[DEVICE_NAME_LEN];
+		
+		//DIO
 		static const unsigned char m_DIOChans[NUM_DIO_CHANS];
+		
+		//SPI
+		static const unsigned char m_SPIChans[NUM_SPI_CHANS];
+		static int m_SPIHandles[NUM_SPI_CHANS];
+		static const char m_SPIPaths[NUM_SPI_CHANS][SPI_PATH_LEN];
 		
 		/****************************************************************************************
 		**  Constructors /  Destructor

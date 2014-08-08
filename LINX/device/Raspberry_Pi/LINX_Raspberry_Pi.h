@@ -4,7 +4,11 @@
 /****************************************************************************************
 **  Includes
 ****************************************************************************************/		
+#include <string>
 #include "../LINX_Device.h"
+
+
+#define SPI_PATH_LEN 64
 
 /****************************************************************************************
 **  Variables
@@ -16,7 +20,9 @@ class LINXRaspberryPi : public LINXDevice
 		/****************************************************************************************
 		**  Variables
 		****************************************************************************************/		
-				
+		int* SPIHandles;									//SPI File Handles
+		const char (*SPIPaths)[SPI_PATH_LEN];	//SPI Channel File Paths
+		
 		/****************************************************************************************
 		**  Constructors
 		****************************************************************************************/
@@ -35,6 +41,10 @@ class LINXRaspberryPi : public LINXDevice
 		//  Base Class Override Functions
 		int digitalWrite(unsigned char numPins, unsigned char* pins, unsigned char* values);
 		
+		//SPI
+		int SPIOpenMaster(unsigned char channel);
+		int SPISetMode(unsigned char channel, unsigned char mode);
+		int SPIWriteRead(unsigned char channel, unsigned char frameSize, unsigned char csChan, unsigned char csLL, unsigned char* sendBuffer, unsigned char* recBuffer);
 		
 	private:
 		/****************************************************************************************

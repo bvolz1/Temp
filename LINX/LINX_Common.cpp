@@ -130,6 +130,25 @@ int processCommand(unsigned char* commandPacketBuffer, unsigned char* responsePa
 		packetize(commandPacketBuffer, responsePacketBuffer, 4, OK); 
 		break;
 		
+	/****************************************************************************************
+	** SPI
+	****************************************************************************************/	
+	case 0x0100: // SPI Open Master
+		LINXDev.SPIOpenMaster(commandPacketBuffer[6]);
+		break;
+	case 0x0101: // SPI Set Bit Order
+		break;
+		
+	case 0x0103: // SPI Set Mode
+		LINXDev.SPISetMode(commandPacketBuffer[6], commandPacketBuffer[7]);
+		break;
+	case 0x0104: // SPI Set Frame Size
+		break;
+	case 0x0107: // SPI Write Read
+		LINXDev.SPIWriteRead(commandPacketBuffer[6], commandPacketBuffer[7], commandPacketBuffer[8], commandPacketBuffer[9], &commandPacketBuffer[10], &responsePacketBuffer[5]);
+		packetize(commandPacketBuffer, responsePacketBuffer, commandPacketBuffer[7], OK); 
+		break;
+		
 	default: //Default Case
 		statusResponse(commandPacketBuffer, responsePacketBuffer, FUNCTION_NOT_SUPPORTED);
 		break;		

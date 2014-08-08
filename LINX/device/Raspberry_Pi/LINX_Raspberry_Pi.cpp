@@ -3,7 +3,11 @@
 ****************************************************************************************/		
 #include <stdio.h>
 #include <string> 
+#include <fcntl.h>
 #include <sstream>
+#include <sys/ioctl.h>
+#include <linux/types.h>
+#include <linux/spi/spidev.h>
 
 #include "../../LINX_Common.h"
 #include "../LINX_Device.h"
@@ -146,4 +150,62 @@ int LINXRaspberryPi::digitalWrite(unsigned char numPins, unsigned char* pins, un
 	}
 	
 	return 0;
+}
+
+int LINXRaspberryPi::SPIOpenMaster(unsigned char channel)
+{
+	fprintf(stdout, "Trying to Open = %s\n", SPIPaths[0]);
+	//Channel Checking Is Done On Farther Up The Stack, So Just Open It
+	int handle = open(SPIPaths[channel], O_RDWR);
+	if (handle < 0)
+	{
+		DEBUG("Failed To Open SPI Channel");
+		return -1;
+	}
+	else
+	{
+		SPIHandles[channel] = handle;
+		return 0;
+	}
+}
+
+int LINXRaspberryPi::SPISetMode(unsigned char channel, unsigned char mode)	
+{
+	
+	int retVal = ioctl(SPIHandles[channel], SPI_IOC_WR_MODE, mode);
+	if(retVal < 0)
+	{
+		DEBUG("Failed To Set SPI Mode");
+		return -1;
+	}
+	else
+	{
+		return 0;
+	}	
+}
+
+int LINXRaspberryPi::SPIWriteRead(unsigned char channel, unsigned char frameSize, unsigned char csChan, unsigned char csLL, unsigned char* sendBuffer, unsigned char* recBuffer)
+{
+	struct spi_ioc_transfer transfer = {
+		transfer.tx_buf = (unsigned long) sendBuffer,
+		transfer.rx_buf = (unsigned long)recBuffer,
+		transfer.len = frameSize,
+		transfer.delay_usecs = 0,
+		transfer.speed_hz = 500000,
+		transfer.bits_per_word = 8,
+	};
+	
+	int retVal = ioctl(SPIHandles[channel], SPI_IOC_MESSAGE(1), &transfer);
+	if (retVal < 1)
+	{
+		DEBUG("Failed To Send SPI Data");
+		fprintf(stdout, "error = %d\n", retVal);
+		return -1;
+	}
+	else
+	{
+		return 0;
+	}
+	
+
 }

@@ -11,9 +11,16 @@
 /****************************************************************************************
 **  Member Variables
 ****************************************************************************************/
+//System
 const unsigned char LINXRaspberryPi_B::m_deviceName[DEVICE_NAME_LEN] = {'R', 'a', 's', 'p', 'b', 'e', 'r', 'r', 'y', ' ', 'P', 'i', ' ', 'M', 'o', 'd', 'e', 'l', ' ', 'B'};
+
+//DIO
 const unsigned char LINXRaspberryPi_B::m_DIOChans[NUM_DIO_CHANS] = {2, 3, 4, 7, 8, 9, 10, 11, 14, 15, 17, 18, 22, 23, 24, 25, 27};
 
+//SPI
+const unsigned char LINXRaspberryPi_B::m_SPIChans[NUM_SPI_CHANS] = {0};
+int  LINXRaspberryPi_B::m_SPIHandles[NUM_SPI_CHANS];
+const char LINXRaspberryPi_B::m_SPIPaths[NUM_SPI_CHANS][SPI_PATH_LEN] = { "/dev/spidev0.0\00" };
 /****************************************************************************************
 **  Constructors /  Destructor
 ****************************************************************************************/
@@ -62,9 +69,10 @@ LINXRaspberryPi_B::LINXRaspberryPi_B()
 	I2CChans = m_I2CChans;
 	
 	//SPI
-	numSPIChans = 1;
-	const unsigned char m_SPIChans[1] = {0};
-	SPIChans = m_SPIChans;
+	numSPIChans = NUM_SPI_CHANS;	
+	SPIChans = m_SPIChans;	
+	SPIHandles = m_SPIHandles;
+	SPIPaths = m_SPIPaths;
 	
 	//CAN
 	numCANChans = 0;

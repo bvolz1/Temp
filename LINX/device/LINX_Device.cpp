@@ -16,10 +16,3 @@ LINXDevice::LINXDevice()
 /****************************************************************************************
 **  Functions
 ****************************************************************************************/
-/*
-int LINXDevice::digitalWrite(unsigned char numPins, unsigned char* pins, unsigned char* values)
-{
-	DEBUG("DigitalWrite At LINX Level");
-	return -1;
-}
-*/
