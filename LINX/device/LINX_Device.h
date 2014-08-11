@@ -78,7 +78,7 @@ class LINXDevice
 		//SPI
 		virtual int SPIOpenMaster(unsigned char channel) = 0;
 		virtual int SPISetMode(unsigned char channel, unsigned char mode) = 0;
-		virtual int SPIWriteRead(unsigned char channel, unsigned char frameSize, unsigned char csChan, unsigned char csLL, unsigned char* sendBuffer, unsigned char* recBuffer) = 0;
+		virtual int SPIWriteRead(unsigned char channel, unsigned char frameSize, unsigned char numFrames, unsigned char csChan, unsigned char csLL, unsigned char* sendBuffer, unsigned char* recBuffer) = 0;
 				
 	private:
 		/****************************************************************************************

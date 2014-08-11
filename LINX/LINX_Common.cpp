@@ -136,17 +136,22 @@ int processCommand(unsigned char* commandPacketBuffer, unsigned char* responsePa
 	case 0x0100: // SPI Open Master
 		LINXDev.SPIOpenMaster(commandPacketBuffer[6]);
 		break;
-	case 0x0101: // SPI Set Bit Order
-		break;
-		
+	case 0x0102: // SPI Set Clock Frequency
+		//LINXDev.SPIOpenMaster(commandPacketBuffer[6]);
+		statusResponse(commandPacketBuffer, responsePacketBuffer, OK);
+		break;		
 	case 0x0103: // SPI Set Mode
 		LINXDev.SPISetMode(commandPacketBuffer[6], commandPacketBuffer[7]);
-		break;
-	case 0x0104: // SPI Set Frame Size
-		break;
+		break;	
 	case 0x0107: // SPI Write Read
-		LINXDev.SPIWriteRead(commandPacketBuffer[6], commandPacketBuffer[7], commandPacketBuffer[8], commandPacketBuffer[9], &commandPacketBuffer[10], &responsePacketBuffer[5]);
-		packetize(commandPacketBuffer, responsePacketBuffer, commandPacketBuffer[7], OK); 
+		if(LINXDev.SPIWriteRead(commandPacketBuffer[6], commandPacketBuffer[7], (commandPacketBuffer[1]-11)/commandPacketBuffer[7], commandPacketBuffer[8], commandPacketBuffer[9], &commandPacketBuffer[10], &responsePacketBuffer[5]) < 0 )
+		{
+			packetize(commandPacketBuffer, responsePacketBuffer, commandPacketBuffer[7], UNKNOWN_ERROR); 
+		}
+		else
+		{
+			packetize(commandPacketBuffer, responsePacketBuffer, commandPacketBuffer[7], OK); 
+		}
 		break;
 		
 	default: //Default Case

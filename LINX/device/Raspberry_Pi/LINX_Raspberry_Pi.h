@@ -44,7 +44,7 @@ class LINXRaspberryPi : public LINXDevice
 		//SPI
 		int SPIOpenMaster(unsigned char channel);
 		int SPISetMode(unsigned char channel, unsigned char mode);
-		int SPIWriteRead(unsigned char channel, unsigned char frameSize, unsigned char csChan, unsigned char csLL, unsigned char* sendBuffer, unsigned char* recBuffer);
+		int SPIWriteRead(unsigned char channel, unsigned char frameSize, unsigned char numFrames, unsigned char csChan, unsigned char csLL, unsigned char* sendBuffer, unsigned char* recBuffer);
 		
 	private:
 		/****************************************************************************************

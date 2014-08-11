@@ -154,7 +154,6 @@ int LINXRaspberryPi::digitalWrite(unsigned char numPins, unsigned char* pins, un
 
 int LINXRaspberryPi::SPIOpenMaster(unsigned char channel)
 {
-	fprintf(stdout, "Trying to Open = %s\n", SPIPaths[0]);
 	//Channel Checking Is Done On Farther Up The Stack, So Just Open It
 	int handle = open(SPIPaths[channel], O_RDWR);
 	if (handle < 0)
@@ -164,6 +163,9 @@ int LINXRaspberryPi::SPIOpenMaster(unsigned char channel)
 	}
 	else
 	{
+		//Default To Mode 0 With No CS (We'll Use GPIO When Performing Write)
+		unsigned long spi_Mode = SPI_NO_CS | SPI_MODE_0;
+		int retVal = ioctl(handle, SPI_IOC_WR_MODE, &spi_Mode);		
 		SPIHandles[channel] = handle;
 		return 0;
 	}
@@ -171,8 +173,7 @@ int LINXRaspberryPi::SPIOpenMaster(unsigned char channel)
 
 int LINXRaspberryPi::SPISetMode(unsigned char channel, unsigned char mode)	
 {
-	
-	int retVal = ioctl(SPIHandles[channel], SPI_IOC_WR_MODE, mode);
+	int retVal = ioctl(SPIHandles[channel], SPI_IOC_WR_MODE, (mode | SPI_NO_CS));
 	if(retVal < 0)
 	{
 		DEBUG("Failed To Set SPI Mode");
@@ -184,28 +185,42 @@ int LINXRaspberryPi::SPISetMode(unsigned char channel, unsigned char mode)
 	}	
 }
 
-int LINXRaspberryPi::SPIWriteRead(unsigned char channel, unsigned char frameSize, unsigned char csChan, unsigned char csLL, unsigned char* sendBuffer, unsigned char* recBuffer)
+int LINXRaspberryPi::SPIWriteRead(unsigned char channel, unsigned char frameSize, unsigned char numFrames, unsigned char csChan, unsigned char csLL, unsigned char* sendBuffer, unsigned char* recBuffer)
 {
-	struct spi_ioc_transfer transfer = {
-		transfer.tx_buf = (unsigned long) sendBuffer,
-		transfer.rx_buf = (unsigned long)recBuffer,
-		transfer.len = frameSize,
-		transfer.delay_usecs = 0,
-		transfer.speed_hz = 500000,
-		transfer.bits_per_word = 8,
-	};
+	unsigned char nextByte = 0;	//First Byte Of Next SPI Frame
 	
-	int retVal = ioctl(SPIHandles[channel], SPI_IOC_MESSAGE(1), &transfer);
-	if (retVal < 1)
-	{
-		DEBUG("Failed To Send SPI Data");
-		fprintf(stdout, "error = %d\n", retVal);
-		return -1;
-	}
-	else
-	{
-		return 0;
-	}
 	
-
+	struct spi_ioc_transfer transfer;
+	
+	//Set CS As Output And Make Sure GPIO CS Starts Idle	
+	GPIOSetDir(csChan, OUTPUT);	
+	GPIOWrite(csChan, (~csLL & 0x01) );
+	
+	for(int i=0; i< numFrames; i++)
+	{
+		//Setup Transfer
+		transfer.tx_buf = (unsigned long)(sendBuffer+nextByte);
+		transfer.rx_buf = (unsigned long)(recBuffer+nextByte);
+		transfer.len = frameSize;
+		transfer.delay_usecs = 0;
+		transfer.speed_hz = 500000;
+		transfer.bits_per_word = 8;
+	
+		//CS Active
+		GPIOWrite(csChan, csLL);
+		
+		//Transfer Data
+		int retVal = ioctl(SPIHandles[channel], SPI_IOC_MESSAGE(1), &transfer);
+		
+		//CS Idle
+		GPIOWrite(csChan, (~csLL & 0x01) );
+		
+		if (retVal < 1)
+		{
+			DEBUG("Failed To Send SPI Data");
+			return -1;
+		}
+	}	
+	
+	return 0;
 }
