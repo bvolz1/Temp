@@ -2,6 +2,11 @@
 #define LINX_COMMON_H
 
 /****************************************************************************************
+** Includes
+****************************************************************************************/
+#include "device/LINX_Device.h"
+
+/****************************************************************************************
 ** Defines
 ****************************************************************************************/
 #ifdef DEBUG_ENABLED
@@ -14,18 +19,16 @@
 	#define DEBUGRESPACKET(x) do {} while (0)					//Compile Out
 #endif	//DEBUG_ENABLED
 
-#include "device/LINX_Device.h"
-
 /****************************************************************************************
-** Variables
+** Typedefs
 ****************************************************************************************/
-enum LINXStatus {OK, FUNCTION_NOT_SUPPORTED, REQUEST_RESEND, UNKNOWN_ERROR};
+enum LINXStatus {L_OK, L_FUNCTION_NOT_SUPPORTED, L_REQUEST_RESEND, L_UNKNOWN_ERROR, L_DISCONNECT};
 
 /****************************************************************************************
 ** Functions
 ****************************************************************************************/
 //LINX Helpers
-int processCommand(unsigned char* recBuffer, unsigned char* sendBuffer, LINXDevice& LINXDev);
+LINXStatus processCommand(unsigned char* recBuffer, unsigned char* sendBuffer, LINXDevice& LINXDev);
 void packetize(unsigned char* commandPacketBuffer, unsigned char* responsePacketBuffer, unsigned int dataSize, LINXStatus status);
 void statusResponse(unsigned char* commandPacketBuffer, unsigned char* responsePacketBuffer, LINXStatus status);
 void dataBufferResponse(unsigned char* commandPacketBuffer, unsigned char* responsePacketBuffer, const unsigned char* dataBuffer, unsigned char dataSize, LINXStatus status);

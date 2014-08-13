@@ -21,6 +21,9 @@ const unsigned char LINXRaspberryPi_B::m_DIOChans[NUM_DIO_CHANS] = {2, 3, 4, 7, 
 const unsigned char LINXRaspberryPi_B::m_SPIChans[NUM_SPI_CHANS] = {0};
 int  LINXRaspberryPi_B::m_SPIHandles[NUM_SPI_CHANS];
 const char LINXRaspberryPi_B::m_SPIPaths[NUM_SPI_CHANS][SPI_PATH_LEN] = { "/dev/spidev0.0\00" };
+unsigned long LINXRaspberryPi_B::m_SPISupportedSpeeds[NUM_SPI_SPEEDS] = {7629, 15200, 30500, 61000, 122000, 244000, 488000, 976000, 1953000, 3900000, 7800000, 15600000, 31200000};
+unsigned long LINXRaspberryPi_B::m_SPISetSpeeds[NUM_SPI_CHANS] = {500000};
+unsigned char LINXRaspberryPi_B::m_SPIBitOrders[NUM_SPI_CHANS] = {MSBFIRST};
 /****************************************************************************************
 **  Constructors /  Destructor
 ****************************************************************************************/
@@ -73,6 +76,10 @@ LINXRaspberryPi_B::LINXRaspberryPi_B()
 	SPIChans = m_SPIChans;	
 	SPIHandles = m_SPIHandles;
 	SPIPaths = m_SPIPaths;
+	numSPISpeeds = NUM_SPI_SPEEDS;
+	SPISupportedSpeeds = m_SPISupportedSpeeds;
+	SPISetSpeeds = m_SPISetSpeeds;	
+	SPIBitOrders = m_SPIBitOrders;
 	
 	//CAN
 	numCANChans = 0;

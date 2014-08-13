@@ -19,8 +19,6 @@ TCPServer::TCPServer()
 	state = START;
 	timeout.tv_sec = 10;		//Set Socket Time-out To Default Value
 	TCPBufIndex = 0;
-	
-	
 }
 
 /****************************************************************************************
@@ -158,12 +156,11 @@ int TCPServer::processPackets(LINXDevice &LINXDev)
 					if(checksumPassed(recBuffer))
 					{					
 						//Process Packet Handle Any Networking Packets
-						unsigned int status = processCommand(recBuffer, sendBuffer, LINXDev);
-						if(status == 0x0011)
+						LINXStatus status = processCommand(recBuffer, sendBuffer, LINXDev);
+						if(status == L_DISCONNECT)
 						{
 							//Host Disconnected.  Listen For New Connection														
-							state = LISTENING;
-							
+							state = LISTENING;							
 						}	
 										
 						

@@ -2,17 +2,31 @@
 #define LINX_DEVICE_H
 
 /****************************************************************************************
+**  Includes
+****************************************************************************************/		
+
+
+/****************************************************************************************
 **  Defines
 ****************************************************************************************/		
 #define INPUT 0x00
 #define OUTPUT 0x01
 
+#define LSBFIRST 0
+#define MSBFIRST 1
+
+/****************************************************************************************
+**  Typedefs
+****************************************************************************************/		
+typedef enum SPIStatus{LSPI_OK, LSPI_UNKNOWN_ERROR}SPIStatus;
+
 class LINXDevice
 {
 	public:	
 		/****************************************************************************************
-		**  Variables
-		****************************************************************************************/		
+		**  Member Variables
+		****************************************************************************************/				
+		
 		//Device ID
 		unsigned char deviceFamily;
 		unsigned char deviceID;
@@ -63,7 +77,6 @@ class LINXDevice
 		//CAN
 		unsigned char numCANChans;
 		const unsigned char* CANChans;
-
 		
 		/****************************************************************************************
 		**  Constructors
@@ -73,24 +86,26 @@ class LINXDevice
 		/****************************************************************************************
 		**  Functions
 		****************************************************************************************/
+		//DIO
 		virtual int digitalWrite(unsigned char numPins, unsigned char* pins, unsigned char* values) = 0;
 		
 		//SPI
-		virtual int SPIOpenMaster(unsigned char channel) = 0;
-		virtual int SPISetMode(unsigned char channel, unsigned char mode) = 0;
-		virtual int SPIWriteRead(unsigned char channel, unsigned char frameSize, unsigned char numFrames, unsigned char csChan, unsigned char csLL, unsigned char* sendBuffer, unsigned char* recBuffer) = 0;
+		virtual SPIStatus SPIOpenMaster(unsigned char channel) = 0;
+		virtual SPIStatus SPISetBitOrder(unsigned char channel, unsigned char bitOrder) = 0;
+		virtual SPIStatus SPISetMode(unsigned char channel, unsigned char mode) = 0;
+		virtual SPIStatus SPISetSpeed(unsigned char channel, unsigned long speed, unsigned long* actualSpeed) = 0;
+		virtual SPIStatus SPIWriteRead(unsigned char channel, unsigned char frameSize, unsigned char numFrames, unsigned char csChan, unsigned char csLL, unsigned char* sendBuffer, unsigned char* recBuffer) = 0;
+		
+		//General - 
+		unsigned char reverseBits(unsigned char b);
 				
 	private:
 		/****************************************************************************************
 		**  Variables
 		****************************************************************************************/		
 				
-				/****************************************************************************************
+		/****************************************************************************************
 		**  Functions
 		****************************************************************************************/
-		
-		
 };
-
-
 #endif //LINX_DEVICE_H
