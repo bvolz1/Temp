@@ -160,8 +160,8 @@ int processCommand(unsigned char* commandPacketBuffer, unsigned char* responsePa
 		statusResponse(commandPacketBuffer, responsePacketBuffer, status);
 		break;
 	case 0x00E3: // I2C Read
-		status = L_FUNCTION_NOT_SUPPORTED;
-		statusResponse(commandPacketBuffer, responsePacketBuffer, status);
+		status = LINXDev.I2CRead(commandPacketBuffer[6], commandPacketBuffer[7], &responsePacketBuffer[5]);
+		packetize(commandPacketBuffer, responsePacketBuffer, commandPacketBuffer[7], status); 		
 		break;
 	case 0x00E4: // I2C Close
 		status = LINXDev.I2CClose((commandPacketBuffer[6]));

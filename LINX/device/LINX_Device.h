@@ -23,8 +23,6 @@
 #define EOF_RESTART_NOSTOP 2
 #define EOF_NOSTOP 3
 
-#define L_STATUS_COMMON 2
-
 /****************************************************************************************
 **  Typedefs
 ****************************************************************************************/		
@@ -37,7 +35,8 @@ typedef enum I2CStatus
 {
 	LI2C_SADDR=128, 
 	LI2C_EOF, 
-	LI2C_WRITE_FAIL, 
+	LI2C_WRITE_FAIL, 	
+	LI2C_READ_FAIL, 
 	LI2C_CLOSE_FAIL
 }I2CStatus;
 

@@ -314,7 +314,11 @@ int LINXRaspberryPi::I2CWrite(unsigned char channel, unsigned char slaveAddress,
 
 int LINXRaspberryPi::I2CRead(unsigned char channel, unsigned char numBytes, unsigned char* recBuffer)
 {
-	return L_FUNCTION_NOT_SUPPORTED;
+	if(read(I2CHandles[channel], recBuffer, numBytes) < numBytes)
+	{
+		return LI2C_READ_FAIL;	
+	}
+	return L_OK;
 }
 
 int LINXRaspberryPi::I2CClose(unsigned char channel)
