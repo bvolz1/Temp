@@ -11,6 +11,8 @@
 #define NUM_SPI_CHANS 1
 #define NUM_SPI_SPEEDS 13
 
+#define NUM_I2C_CHANS 2
+
 /****************************************************************************************
 **  Includes
 ****************************************************************************************/		
@@ -35,6 +37,11 @@ class LINXRaspberryPi_B : public LINXRaspberryPi
 		static unsigned long m_SPISupportedSpeeds[NUM_SPI_SPEEDS];
 		static unsigned long m_SPISetSpeeds[NUM_SPI_CHANS];
 		static unsigned char m_SPIBitOrders[NUM_SPI_CHANS];
+		
+		//I2C
+		static unsigned char m_I2CChans[NUM_I2C_CHANS];
+		static int m_I2CHandles[NUM_I2C_CHANS];
+		static const char m_I2CPaths[NUM_I2C_CHANS][I2C_PATH_LEN];
 		
 		/****************************************************************************************
 		**  Constructors /  Destructor

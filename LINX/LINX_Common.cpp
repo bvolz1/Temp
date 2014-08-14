@@ -31,13 +31,13 @@ bool checksumPassed(unsigned char* packetBuffer)
 }
 
 
-void statusResponse(unsigned char* commandPacketBuffer, unsigned char* responsePacketBuffer, LINXStatus status)
+void statusResponse(unsigned char* commandPacketBuffer, unsigned char* responsePacketBuffer, int status)
 {
 	packetize(commandPacketBuffer, responsePacketBuffer, 0, status); 
 }
 
 
-LINXStatus processCommand(unsigned char* commandPacketBuffer, unsigned char* responsePacketBuffer, LINXDevice &LINXDev)
+int processCommand(unsigned char* commandPacketBuffer, unsigned char* responsePacketBuffer, LINXDevice &LINXDev)
 {
 	DEBUGCMDPACKET(commandPacketBuffer);
 		
@@ -45,7 +45,7 @@ LINXStatus processCommand(unsigned char* commandPacketBuffer, unsigned char* res
 	unsigned char commandLength = commandPacketBuffer[1];
 	unsigned int command = commandPacketBuffer[4] << 8 | commandPacketBuffer[5];
 	
-	LINXStatus Lstatus = L_OK;
+	int status = L_OK;
 	
 	switch(command)
 	{
@@ -107,7 +107,7 @@ LINXStatus processCommand(unsigned char* commandPacketBuffer, unsigned char* res
        break;
 		
 	case 0x0011: // Disconnect
-		//Nothing To Do Here.  This Function Will Return CMD To Network Stack Which Will Drop The Connection
+		status = L_DISCONNECT;
 		break;
 		
 	case 0x0024: // Get Device Name
@@ -133,10 +133,45 @@ LINXStatus processCommand(unsigned char* commandPacketBuffer, unsigned char* res
 		packetize(commandPacketBuffer, responsePacketBuffer, 4, L_OK); 
 		break;
 		
+		
+	/****************************************************************************************
+	** I2C
+	****************************************************************************************/	
+	case 0x00E0: // I2C Open Master
+		status = LINXDev.I2COpenMaster(commandPacketBuffer[6]);
+		statusResponse(commandPacketBuffer, responsePacketBuffer, status);
+		break;
+	case 0x00E1: // I2C Set Speed
+	{
+		unsigned long targetSpeed = (unsigned long)((commandPacketBuffer[7] << 24) | (commandPacketBuffer[8] << 16) | (commandPacketBuffer[9] << 8) | commandPacketBuffer[10]);
+		unsigned long actualSpeed = 0;
+		status = LINXDev.I2CSetSpeed(commandPacketBuffer[6], targetSpeed, &actualSpeed);
+		
+		//Build Response Packet
+		responsePacketBuffer[5] = (actualSpeed>>24) & 0xFF;		//Actual Speed MSB
+		responsePacketBuffer[6] = (actualSpeed>>16) & 0xFF;		//...
+		responsePacketBuffer[7] = (actualSpeed>>8) & 0xFF;			//...
+		responsePacketBuffer[8] = actualSpeed & 0xFF;					//Actual Speed LSB		
+		packetize(commandPacketBuffer, responsePacketBuffer, 4, status); 
+		break;
+	}
+	case 0x00E2: // I2C Write
+		status = LINXDev.I2CWrite(commandPacketBuffer[6], commandPacketBuffer[7], commandPacketBuffer[8], (commandPacketBuffer[1]-10), &commandPacketBuffer[9]);
+		statusResponse(commandPacketBuffer, responsePacketBuffer, status);
+		break;
+	case 0x00E3: // I2C Read
+		status = L_FUNCTION_NOT_SUPPORTED;
+		statusResponse(commandPacketBuffer, responsePacketBuffer, status);
+		break;
+	case 0x00E4: // I2C Close
+		status = LINXDev.I2CClose((commandPacketBuffer[6]));
+		statusResponse(commandPacketBuffer, responsePacketBuffer, status);
+		break;
+		
 	/****************************************************************************************
 	** SPI
 	****************************************************************************************/	
-	case 0x0100: // SPI Open Masters
+	case 0x0100: // SPI Open Master
 		LINXDev.SPIOpenMaster(commandPacketBuffer[6]);
 		statusResponse(commandPacketBuffer, responsePacketBuffer, L_OK);
 		break;
@@ -147,71 +182,61 @@ LINXStatus processCommand(unsigned char* commandPacketBuffer, unsigned char* res
 		
 	case 0x0102: // SPI Set Clock Frequency				
 	{
-		unsigned long actualFreq = 0;
-		SPIStatus spiStatus = LINXDev.SPISetSpeed( commandPacketBuffer[6], (unsigned long)((commandPacketBuffer[7] << 24) | (commandPacketBuffer[8] << 16) | (commandPacketBuffer[9] << 8) | commandPacketBuffer[10]), &actualFreq );
+		unsigned long targetSpeed = (unsigned long)((commandPacketBuffer[7] << 24) | (commandPacketBuffer[8] << 16) | (commandPacketBuffer[9] << 8) | commandPacketBuffer[10]);
+		unsigned long actualSpeed = 0;
+		status = LINXDev.SPISetSpeed( commandPacketBuffer[6], targetSpeed, &actualSpeed );
 		//Build Response Packet
-		responsePacketBuffer[5] = (actualFreq>>24) & 0xFF;		//Actual Freq MSB
-		responsePacketBuffer[6] = (actualFreq>>16) & 0xFF;		//...
-		responsePacketBuffer[7] = (actualFreq>>8) & 0xFF;			//...
-		responsePacketBuffer[8] = actualFreq & 0xFF;					//Actual Freq LSB		
+		responsePacketBuffer[5] = (actualSpeed>>24) & 0xFF;		//Actual Speed MSB
+		responsePacketBuffer[6] = (actualSpeed>>16) & 0xFF;		//...
+		responsePacketBuffer[7] = (actualSpeed>>8) & 0xFF;			//...
+		responsePacketBuffer[8] = actualSpeed & 0xFF;					//Actual Speed LSB		
 		packetize(commandPacketBuffer, responsePacketBuffer, 4, L_OK); 
 		break;		
 	}	
 	case 0x0103: // SPI Set Mode
 	{
 		//Set SPI Mode
-		SPIStatus spiStatus = LINXDev.SPISetMode(commandPacketBuffer[6], commandPacketBuffer[7]);
-		
-		//Check For Errors
-		if(spiStatus != LSPI_OK)
-		{
-			Lstatus = L_UNKNOWN_ERROR;
-		}
-		else
-		{
-			Lstatus = L_OK;
-		}
+		status = LINXDev.SPISetMode(commandPacketBuffer[6], commandPacketBuffer[7]);
 		
 		//Build Response Packet
-		packetize(commandPacketBuffer, responsePacketBuffer, 4, Lstatus); 
+		packetize(commandPacketBuffer, responsePacketBuffer, 4, status); 
 		break;	
 	}
 	case 0x0107: // SPI Write Read
 	{
-		
-		SPIStatus spiStatus = LINXDev.SPIWriteRead(commandPacketBuffer[6], commandPacketBuffer[7], (commandPacketBuffer[1]-11)/commandPacketBuffer[7], commandPacketBuffer[8], commandPacketBuffer[9], &commandPacketBuffer[10], &responsePacketBuffer[5]);
-		
-		if(spiStatus != LSPI_OK)
-		{
-			packetize(commandPacketBuffer, responsePacketBuffer, commandPacketBuffer[7], L_UNKNOWN_ERROR); 
-		}
-		else
-		{
-			packetize(commandPacketBuffer, responsePacketBuffer, commandPacketBuffer[7], L_OK); 
-		}
+		status = LINXDev.SPIWriteRead(commandPacketBuffer[6], commandPacketBuffer[7], (commandPacketBuffer[1]-11)/commandPacketBuffer[7], commandPacketBuffer[8], commandPacketBuffer[9], &commandPacketBuffer[10], &responsePacketBuffer[5]);
+		packetize(commandPacketBuffer, responsePacketBuffer, commandPacketBuffer[7]*commandPacketBuffer[8], status); 
 		break;
 	}
 	
 	default: //Default Case
-		statusResponse(commandPacketBuffer, responsePacketBuffer, L_FUNCTION_NOT_SUPPORTED);
+		statusResponse(commandPacketBuffer, responsePacketBuffer, (int)L_FUNCTION_NOT_SUPPORTED);
 		break;		
 	}
 	
 	//Print Response Packet If Debugging Is Enabled
 	DEBUGRESPACKET(responsePacketBuffer);	
 	
-	return Lstatus;
+	return status;
 }
 
 
-void packetize(unsigned char* commandPacketBuffer, unsigned char* responsePacketBuffer, unsigned int dataSize, LINXStatus status)
+void packetize(unsigned char* commandPacketBuffer, unsigned char* responsePacketBuffer, unsigned int dataSize,  int status)
 {
 	//Load Header
 	responsePacketBuffer[0] = 0xFF;                                 //SoF
 	responsePacketBuffer[1] = dataSize+6; 						//PACKET SIZE
 	responsePacketBuffer[2] = commandPacketBuffer[2];	//PACKET NUM (MSB)
 	responsePacketBuffer[3] = commandPacketBuffer[3];	//PACKET NUM (LSB)
-	responsePacketBuffer[4] = status;								//Status
+	//Make Sure Status Is Valid
+	if(status >= 0 && status <= 255)
+	{
+		responsePacketBuffer[4] = (unsigned char)status;	//Status
+	}
+	else
+	{
+		responsePacketBuffer[4] = (unsigned char)L_UNKNOWN_ERROR;	//Status
+	}
 	
 	//Compute And Load Checksum
 	responsePacketBuffer[dataSize+5] = computeChecksum(responsePacketBuffer);	
@@ -241,7 +266,7 @@ void debug_printResPacket(unsigned char* packetBuffer)
 }
 #endif //DEBUG_ENABLED
 
-void dataBufferResponse(unsigned char* commandPacketBuffer, unsigned char* responsePacketBuffer, const unsigned char* dataBuffer, unsigned char dataSize, LINXStatus status)
+void dataBufferResponse(unsigned char* commandPacketBuffer, unsigned char* responsePacketBuffer, const unsigned char* dataBuffer, unsigned char dataSize, int status)
 {
 	
 	//Copy Data Into Response Buffer

@@ -21,9 +21,16 @@ const unsigned char LINXRaspberryPi_B::m_DIOChans[NUM_DIO_CHANS] = {2, 3, 4, 7, 
 const unsigned char LINXRaspberryPi_B::m_SPIChans[NUM_SPI_CHANS] = {0};
 int  LINXRaspberryPi_B::m_SPIHandles[NUM_SPI_CHANS];
 const char LINXRaspberryPi_B::m_SPIPaths[NUM_SPI_CHANS][SPI_PATH_LEN] = { "/dev/spidev0.0\00" };
+
 unsigned long LINXRaspberryPi_B::m_SPISupportedSpeeds[NUM_SPI_SPEEDS] = {7629, 15200, 30500, 61000, 122000, 244000, 488000, 976000, 1953000, 3900000, 7800000, 15600000, 31200000};
 unsigned long LINXRaspberryPi_B::m_SPISetSpeeds[NUM_SPI_CHANS] = {500000};
 unsigned char LINXRaspberryPi_B::m_SPIBitOrders[NUM_SPI_CHANS] = {MSBFIRST};
+
+//I2C
+unsigned char LINXRaspberryPi_B::m_I2CChans[NUM_I2C_CHANS] = {0, 1};
+int LINXRaspberryPi_B::m_I2CHandles[NUM_I2C_CHANS];
+const char LINXRaspberryPi_B::m_I2CPaths[NUM_I2C_CHANS][I2C_PATH_LEN] = { "/dev/i2c-0\00", "/dev/i2c-1\00" };
+
 /****************************************************************************************
 **  Constructors /  Destructor
 ****************************************************************************************/
@@ -67,15 +74,17 @@ LINXRaspberryPi_B::LINXRaspberryPi_B()
 	UARTChans = m_UARTChans;
 	
 	//I2C
-	numI2CChans = 1;
-	const unsigned char m_I2CChans[1] = {0};
+	numI2CChans = NUM_I2C_CHANS;	
 	I2CChans = m_I2CChans;
+	I2CPaths = m_I2CPaths;
+	I2CHandles = m_I2CHandles;
 	
 	//SPI
 	numSPIChans = NUM_SPI_CHANS;	
-	SPIChans = m_SPIChans;	
-	SPIHandles = m_SPIHandles;
+	SPIChans = m_SPIChans;		
 	SPIPaths = m_SPIPaths;
+	SPIHandles = m_SPIHandles;
+	
 	numSPISpeeds = NUM_SPI_SPEEDS;
 	SPISupportedSpeeds = m_SPISupportedSpeeds;
 	SPISetSpeeds = m_SPISetSpeeds;	

@@ -156,10 +156,11 @@ int TCPServer::processPackets(LINXDevice &LINXDev)
 					if(checksumPassed(recBuffer))
 					{					
 						//Process Packet Handle Any Networking Packets
-						LINXStatus status = processCommand(recBuffer, sendBuffer, LINXDev);
+						int status = processCommand(recBuffer, sendBuffer, LINXDev);
 						if(status == L_DISCONNECT)
 						{
 							//Host Disconnected.  Listen For New Connection														
+							DEBUG("Disconnect");
 							state = LISTENING;							
 						}	
 										
@@ -187,7 +188,8 @@ int TCPServer::processPackets(LINXDevice &LINXDev)
 		{
 			//Bad SoF, Flush Socket
 			DEBUG("Bad SoF");
-			recv(clientsock, recBuffer, PACKET_BUFFER_SIZE, MSG_DONTWAIT);		
+			recv(clientsock, recBuffer, PACKET_BUFFER_SIZE, MSG_DONTWAIT);
+			printf("Got %s\n", recBuffer);
 		}
 	}
 }

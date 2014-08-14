@@ -28,10 +28,10 @@ enum LINXStatus {L_OK, L_FUNCTION_NOT_SUPPORTED, L_REQUEST_RESEND, L_UNKNOWN_ERR
 ** Functions
 ****************************************************************************************/
 //LINX Helpers
-LINXStatus processCommand(unsigned char* recBuffer, unsigned char* sendBuffer, LINXDevice& LINXDev);
-void packetize(unsigned char* commandPacketBuffer, unsigned char* responsePacketBuffer, unsigned int dataSize, LINXStatus status);
-void statusResponse(unsigned char* commandPacketBuffer, unsigned char* responsePacketBuffer, LINXStatus status);
-void dataBufferResponse(unsigned char* commandPacketBuffer, unsigned char* responsePacketBuffer, const unsigned char* dataBuffer, unsigned char dataSize, LINXStatus status);
+int processCommand(unsigned char* recBuffer, unsigned char* sendBuffer, LINXDevice& LINXDev);
+void packetize(unsigned char* commandPacketBuffer, unsigned char* responsePacketBuffer, unsigned int dataSize, int status);
+void statusResponse(unsigned char* commandPacketBuffer, unsigned char* responsePacketBuffer, int status);
+void dataBufferResponse(unsigned char* commandPacketBuffer, unsigned char* responsePacketBuffer, const unsigned char* dataBuffer, unsigned char dataSize, int status);
 unsigned char computeChecksum(unsigned char* packetBuffer);
 bool checksumPassed(unsigned char* packetBuffer);
 

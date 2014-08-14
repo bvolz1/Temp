@@ -9,6 +9,7 @@
 
 
 #define SPI_PATH_LEN 64
+#define I2C_PATH_LEN 64
 
 /****************************************************************************************
 **  Variables
@@ -20,6 +21,7 @@ class LINXRaspberryPi : public LINXDevice
 		/****************************************************************************************
 		**  Variables
 		****************************************************************************************/		
+		//SPI
 		int* SPIHandles;											//SPI File Handles
 		const char (*SPIPaths)[SPI_PATH_LEN];			//SPI Channel File Paths
 		unsigned char numSPISpeeds;						//Number Of Supported SPI Speeds
@@ -27,6 +29,9 @@ class LINXRaspberryPi : public LINXDevice
 		unsigned long* SPISetSpeeds;						//Set SPI Clock Frequencies
 		unsigned char* SPIBitOrders;							//SPI Bit Orders
 			
+		//I2C
+		int* I2CHandles;											//I2C File Handles
+		const char (*I2CPaths)[I2C_PATH_LEN];			//I2C Channel File Paths
 		
 		/****************************************************************************************
 		**  Constructors
@@ -47,11 +52,18 @@ class LINXRaspberryPi : public LINXDevice
 		int digitalWrite(unsigned char numPins, unsigned char* pins, unsigned char* values);
 		
 		//SPI
-		SPIStatus SPIOpenMaster(unsigned char channel);
-		SPIStatus SPISetMode(unsigned char channel, unsigned char mode);
-		SPIStatus SPISetBitOrder(unsigned char channel, unsigned char mode);
-		SPIStatus SPISetSpeed(unsigned char channel, unsigned long speed, unsigned long* actualSpeed);
-		SPIStatus SPIWriteRead(unsigned char channel, unsigned char frameSize, unsigned char numFrames, unsigned char csChan, unsigned char csLL, unsigned char* sendBuffer, unsigned char* recBuffer);
+		int SPIOpenMaster(unsigned char channel);
+		int SPISetMode(unsigned char channel, unsigned char mode);
+		int SPISetBitOrder(unsigned char channel, unsigned char mode);
+		int SPISetSpeed(unsigned char channel, unsigned long speed, unsigned long* actualSpeed);
+		int SPIWriteRead(unsigned char channel, unsigned char frameSize, unsigned char numFrames, unsigned char csChan, unsigned char csLL, unsigned char* sendBuffer, unsigned char* recBuffer);
+		
+		//I2C
+		int I2COpenMaster(unsigned char channel);
+		int I2CSetSpeed(unsigned char channel, unsigned long speed, unsigned long* actualSpeed);
+		int I2CWrite(unsigned char channel, unsigned char slaveAddress, unsigned char eofConfig, unsigned char numBytes, unsigned char* sendBuffer);
+		int I2CRead(unsigned char channel, unsigned char numBytes, unsigned char* recBuffer);
+		int I2CClose(unsigned char channel);
 		
 	private:
 		/****************************************************************************************

@@ -4,9 +4,13 @@
 #include <stdio.h>
 #include <string> 
 #include <fcntl.h>
+#include <errno.h>
+#include <string.h>
 #include <sstream>
+#include <unistd.h>
 #include <sys/ioctl.h>
 #include <linux/types.h>
+#include <linux/i2c-dev.h>
 #include <linux/spi/spidev.h>
 
 #include "../../LINX_Common.h"
@@ -154,14 +158,14 @@ int LINXRaspberryPi::digitalWrite(unsigned char numPins, unsigned char* pins, un
 
 //----------SPI
 
-SPIStatus LINXRaspberryPi::SPIOpenMaster(unsigned char channel)
+int LINXRaspberryPi::SPIOpenMaster(unsigned char channel)
 {
 	//Channel Checking Is Done On Farther Up The Stack, So Just Open It
 	int handle = open(SPIPaths[channel], O_RDWR);
 	if (handle < 0)
 	{
 		DEBUG("Failed To Open SPI Channel");
-		return  LSPI_UNKNOWN_ERROR;
+		return  L_UNKNOWN_ERROR;
 	}
 	else
 	{
@@ -169,35 +173,34 @@ SPIStatus LINXRaspberryPi::SPIOpenMaster(unsigned char channel)
 		unsigned long spi_Mode = SPI_NO_CS | SPI_MODE_0;
 		int retVal = ioctl(handle, SPI_IOC_WR_MODE, &spi_Mode);		
 		SPIHandles[channel] = handle;
-		return LSPI_OK;
+		return L_OK;
 	}
 }
 
-SPIStatus LINXRaspberryPi::SPISetBitOrder(unsigned char channel, unsigned char bitOrder)
+int LINXRaspberryPi::SPISetBitOrder(unsigned char channel, unsigned char bitOrder)
 {
 	//Store Bit Order.  This Will Be Used During Write
 	*(SPIBitOrders+channel) = bitOrder;
 }
 
-SPIStatus LINXRaspberryPi::SPISetMode(unsigned char channel, unsigned char mode)	
+int LINXRaspberryPi::SPISetMode(unsigned char channel, unsigned char mode)	
 {
 	unsigned long spi_Mode = SPI_NO_CS | (unsigned long) mode;
 	int retVal = ioctl(SPIHandles[channel], SPI_IOC_WR_MODE, &spi_Mode);
 	if(retVal < 0)
 	{
 		DEBUG("Failed To Set SPI Mode");
-		return  LSPI_UNKNOWN_ERROR;
+		return  L_UNKNOWN_ERROR;
 	}
 	else
 	{
-		return LSPI_OK;
+		return L_OK;
 	}	
 }
 
-SPIStatus LINXRaspberryPi::SPISetSpeed(unsigned char channel, unsigned long speed, unsigned long* actualSpeed)
+int LINXRaspberryPi::SPISetSpeed(unsigned char channel, unsigned long speed, unsigned long* actualSpeed)
 {
 
-	printf("Target Clock Freq = %d\n", speed);
 	int index = 0;
 	//Loop Over All Supported SPI Speeds
 	for(index=0; index < numSPISpeeds; index++)
@@ -208,16 +211,14 @@ SPIStatus LINXRaspberryPi::SPISetSpeed(unsigned char channel, unsigned long spee
 				index = index - 1; //Use Fastest Speed Below Target Speed
 				break;
 			}
-			//If Target Speed Is Higher Than Max Speed Use Max Speed
-			
+			//If Target Speed Is Higher Than Max Speed Use Max Speed			
 	}
-	printf("Actual Clock Freq = %d\n", *(SPISupportedSpeeds+index));
 	*(SPISetSpeeds+channel) = *(SPISupportedSpeeds+index);
 	*actualSpeed = *(SPISupportedSpeeds+index);
-	return LSPI_OK;
+	return L_OK;
 }
 
-SPIStatus LINXRaspberryPi::SPIWriteRead(unsigned char channel, unsigned char frameSize, unsigned char numFrames, unsigned char csChan, unsigned char csLL, unsigned char* sendBuffer, unsigned char* recBuffer)
+int LINXRaspberryPi::SPIWriteRead(unsigned char channel, unsigned char frameSize, unsigned char numFrames, unsigned char csChan, unsigned char csLL, unsigned char* sendBuffer, unsigned char* recBuffer)
 {
 	unsigned char nextByte = 0;	//First Byte Of Next SPI Frame	
 	
@@ -226,9 +227,7 @@ SPIStatus LINXRaspberryPi::SPIWriteRead(unsigned char channel, unsigned char fra
 	{
 		for(int i=0; i< frameSize*numFrames; i++)
 		{			
-			printf("Flipping %X to ", sendBuffer[i]);
-			sendBuffer[i] = reverseBits(sendBuffer[i]); 
-			printf("%X\n", sendBuffer[i]);
+			sendBuffer[i] = reverseBits(sendBuffer[i]);
 		}
 	}
 	
@@ -245,7 +244,8 @@ SPIStatus LINXRaspberryPi::SPIWriteRead(unsigned char channel, unsigned char fra
 		transfer.rx_buf = (unsigned long)(recBuffer+nextByte);
 		transfer.len = frameSize;
 		transfer.delay_usecs = 0;
-		transfer.speed_hz = *(SPISupportedSpeeds+channel);
+		transfer.speed_hz = *(SPISetSpeeds+channel) * 2;
+		//transfer.speed_hz = 3000000;
 		transfer.bits_per_word = 8;
 	
 		//CS Active
@@ -260,9 +260,70 @@ SPIStatus LINXRaspberryPi::SPIWriteRead(unsigned char channel, unsigned char fra
 		if (retVal < 1)
 		{
 			DEBUG("Failed To Send SPI Data");
-			return  LSPI_UNKNOWN_ERROR;
+			return  L_UNKNOWN_ERROR;
 		}
 	}	
 	
-	return LSPI_OK;
+	return L_OK;
+}
+
+//----------I2C----------//
+int LINXRaspberryPi::I2COpenMaster(unsigned char channel)
+{
+	int handle = open(I2CPaths[channel], O_RDWR);
+	if (handle < 0)
+	{
+		DEBUG("Failed To Open I2C Channel");
+		return  L_UNKNOWN_ERROR;
+	}
+	else
+	{
+		I2CHandles[channel] = handle;
+	}
+	return L_OK;
+}
+
+int LINXRaspberryPi::I2CSetSpeed(unsigned char channel, unsigned long speed, unsigned long* actualSpeed)
+{
+	return  L_FUNCTION_NOT_SUPPORTED;
+}
+
+int LINXRaspberryPi::I2CWrite(unsigned char channel, unsigned char slaveAddress, unsigned char eofConfig, unsigned char numBytes, unsigned char* sendBuffer)
+{
+	//Check EOF - Currently Only Support 0x00
+	if(eofConfig != EOF_STOP)
+	{
+		return LI2C_EOF;	
+	}
+	
+	//Set Slave Address
+	if (ioctl(I2CHandles[channel], I2C_SLAVE, slaveAddress) < 0) 
+	{
+		//Failed To Set Slave Address
+		return LI2C_SADDR;
+	}
+		
+	//Write Data
+	if(write(I2CHandles[channel], sendBuffer, numBytes) != numBytes)
+	{
+		return LI2C_WRITE_FAIL;
+	}
+	
+	return L_OK;
+}
+
+int LINXRaspberryPi::I2CRead(unsigned char channel, unsigned char numBytes, unsigned char* recBuffer)
+{
+	return L_FUNCTION_NOT_SUPPORTED;
+}
+
+int LINXRaspberryPi::I2CClose(unsigned char channel)
+{
+	//Close I2C Channel
+	if(close(I2CHandles[channel]) < 0)
+	{
+		return LI2C_CLOSE_FAIL;
+	}
+	
+	return L_OK;
 }
