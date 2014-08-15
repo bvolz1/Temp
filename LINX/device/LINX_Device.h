@@ -37,8 +37,14 @@ typedef enum I2CStatus
 	LI2C_EOF, 
 	LI2C_WRITE_FAIL, 	
 	LI2C_READ_FAIL, 
-	LI2C_CLOSE_FAIL
+	LI2C_CLOSE_FAIL,
+	LI2C_OPEN_FAIL
 }I2CStatus;
+
+typedef enum UartStatus
+{
+	LUART_OPEN_FAIL=128
+}UartStatus;
 
 class LINXDevice
 {
@@ -83,8 +89,8 @@ class LINXDevice
 		const unsigned char* QEChans;
 		
 		//UART
-		unsigned char numUARTChans;
-		const unsigned char* UARTChans;
+		unsigned char NumUartChans;
+		const unsigned char* UartChans;
 		
 		//I2C
 		unsigned char numI2CChans;
@@ -120,8 +126,17 @@ class LINXDevice
 		virtual int I2COpenMaster(unsigned char channel) = 0;
 		virtual int I2CSetSpeed(unsigned char channel, unsigned long speed, unsigned long* actualSpeed) = 0;
 		virtual int I2CWrite(unsigned char channel, unsigned char slaveAddress, unsigned char eofConfig, unsigned char numBytes, unsigned char* sendBuffer) = 0;
-		virtual int I2CRead(unsigned char channel, unsigned char slaveAddress, unsigned char eofConfig, unsigned char numBytes, unsigned int timeout, unsigned char* recBuffer) = 0;
+		virtual int I2CRead(unsigned char channel, unsigned char slaveAddress, unsigned char eofConfig, unsigned char numBytes, unsigned int timeout, unsigned char* recBuffer) = 0;		
 		virtual int I2CClose(unsigned char channel) = 0;
+		
+		//UART
+		virtual int UartOpen(unsigned char channel, unsigned long baudRate, unsigned long* actualBaud) = 0;
+		virtual int UartSetBaudRate(unsigned char channel, unsigned long baudRate, unsigned long* actualBaud) = 0;
+		virtual int UartGetBytesAvailable(unsigned char channel, unsigned char *numBytes) = 0;
+		virtual int UartRead(unsigned char channel, unsigned char numBytes, unsigned char* recBuffer) = 0;
+		virtual int UartWrite(unsigned char channel, unsigned char numBytes, unsigned char* sendBuffer) = 0;
+		virtual int UartClose(unsigned char channel) = 0;
+		
 		
 		//General - 
 		unsigned char reverseBits(unsigned char b);

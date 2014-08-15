@@ -91,7 +91,7 @@ int processCommand(unsigned char* commandPacketBuffer, unsigned char* responsePa
        break;
 	   
     case 0x000D: // Get UART Channels
-       dataBufferResponse(commandPacketBuffer, responsePacketBuffer, LINXDev.UARTChans, LINXDev.numUARTChans, L_OK);
+       dataBufferResponse(commandPacketBuffer, responsePacketBuffer, LINXDev.UartChans, LINXDev.NumUartChans, L_OK);
        break;
 	   
     case 0x000E: // Get I2C Channels

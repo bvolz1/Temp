@@ -13,6 +13,9 @@
 #include <linux/i2c-dev.h>
 #include <linux/spi/spidev.h>
 
+
+#include <termios.h>		//UART Support
+
 #include "../../LINX_Common.h"
 #include "../LINX_Device.h"
 #include "LINX_Raspberry_Pi.h"
@@ -274,7 +277,7 @@ int LINXRaspberryPi::I2COpenMaster(unsigned char channel)
 	if (handle < 0)
 	{
 		DEBUG("Failed To Open I2C Channel");
-		return  L_UNKNOWN_ERROR;
+		return  LI2C_OPEN_FAIL;
 	}
 	else
 	{
@@ -343,4 +346,80 @@ int LINXRaspberryPi::I2CClose(unsigned char channel)
 	}
 	
 	return L_OK;
+}
+
+//UART
+int LINXRaspberryPi::UartOpen(unsigned char channel, unsigned long baudRate, unsigned long* actualBaud)
+{
+	//Open UART
+	int handle = open(UartPaths[channel],  O_RDWR | O_NOCTTY | O_NDELAY);
+	if (handle < 0)
+	{
+		DEBUG("Failed To Open UART Channel");
+		return  LUART_OPEN_FAIL;
+	}	
+	else
+	{
+		UartHandles[channel] = handle;
+	}
+	
+	UartSetBaudRate(channel, baudRate, actualBaud);
+	
+	return L_OK;
+}
+
+int LINXRaspberryPi::UartSetBaudRate(unsigned char channel, unsigned long baudRate , unsigned long* actualBaud)
+{
+	
+	//Get Closest Support Baud Rate Without Going Over
+	
+	//Loop Over All Supported SPI Speeds
+	int index = 0;
+	for(index=0; index < NumUartSpeeds; index++)
+	{
+			
+			if(baudRate < *(UartSupportedSpeeds+index))
+			{
+				index = index - 1; //Use Fastest Baud Less Or Equal To Target Baud
+				break;
+			}
+			//If Target Baud Is Higher Than Max Baud Use Max Baud			
+	}
+	
+	//Store Actual Baud Used
+	*actualBaud = *(UartSupportedSpeeds+index);
+	
+	//Set Baud Rate
+	struct termios options;	
+	tcgetattr(UartHandles[channel], &options);
+	
+	options.c_cflag = *(SPISupportedSpeeds+index) | CS8 | CLOCAL | CREAD;
+	options.c_iflag = IGNPAR;
+	options.c_oflag = 0;
+	options.c_lflag = 0;
+	
+	tcflush(UartHandles[channel], TCIFLUSH);	
+	tcsetattr(UartHandles[channel], TCSANOW, &options);
+	
+	return  L_OK;
+}
+
+int LINXRaspberryPi::UartGetBytesAvailable(unsigned char channel, unsigned char *numBytes)
+{
+	return  L_OK;
+}
+
+int LINXRaspberryPi::UartRead(unsigned char channel, unsigned char numBytes, unsigned char* recBuffer)
+{
+	return  L_OK;
+}
+
+int LINXRaspberryPi::UartWrite(unsigned char channel, unsigned char numBytes, unsigned char* sendBuffer)
+{
+	return  L_OK;
+}
+
+int LINXRaspberryPi::UartClose(unsigned char channel)
+{
+	return  L_OK;
 }

@@ -10,6 +10,7 @@
 
 #define SPI_PATH_LEN 64
 #define I2C_PATH_LEN 64
+#define UART_PATH_LEN 64
 
 /****************************************************************************************
 **  Variables
@@ -32,6 +33,12 @@ class LINXRaspberryPi : public LINXDevice
 		//I2C
 		int* I2CHandles;											//I2C File Handles
 		const char (*I2CPaths)[I2C_PATH_LEN];			//I2C Channel File Paths
+		
+		//UART
+		int* UartHandles;											//UART File Handles
+		const char (*UartPaths)[UART_PATH_LEN];		//UART Channel File Paths
+		unsigned char NumUartSpeeds;						///Number Of Support UART Buads
+		unsigned long* UartSupportedSpeeds;				//Supported UART Bauds Frequencies
 		
 		/****************************************************************************************
 		**  Constructors
@@ -64,6 +71,14 @@ class LINXRaspberryPi : public LINXDevice
 		int I2CWrite(unsigned char channel, unsigned char slaveAddress, unsigned char eofConfig, unsigned char numBytes, unsigned char* sendBuffer);
 		int I2CRead(unsigned char channel, unsigned char slaveAddress, unsigned char eofConfig, unsigned char numBytes, unsigned int timeout, unsigned char* recBuffer);
 		int I2CClose(unsigned char channel);
+		
+		//UART
+		int UartOpen(unsigned char channel, unsigned long baudRate, unsigned long* actualBaud);
+		int UartSetBaudRate(unsigned char channel, unsigned long baudRate, unsigned long* actualBaud);
+		int UartGetBytesAvailable(unsigned char channel, unsigned char *numBytes);
+		int UartRead(unsigned char channel, unsigned char numBytes, unsigned char* recBuffer);
+		int UartWrite(unsigned char channel, unsigned char numBytes, unsigned char* sendBuffer);
+		int UartClose(unsigned char channel);
 		
 	private:
 		/****************************************************************************************

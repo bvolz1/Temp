@@ -13,6 +13,9 @@
 
 #define NUM_I2C_CHANS 2
 
+#define NUM_UART_CHANS 1
+#define NUM_UART_SPEEDS 19
+
 /****************************************************************************************
 **  Includes
 ****************************************************************************************/		
@@ -42,6 +45,12 @@ class LINXRaspberryPi_B : public LINXRaspberryPi
 		static unsigned char m_I2CChans[NUM_I2C_CHANS];
 		static int m_I2CHandles[NUM_I2C_CHANS];
 		static const char m_I2CPaths[NUM_I2C_CHANS][I2C_PATH_LEN];
+		
+		//UART
+		static unsigned char m_UartChans[NUM_UART_CHANS];
+		static int m_UartHandles[NUM_UART_CHANS];
+		static const char m_UartPaths[NUM_UART_CHANS][UART_PATH_LEN];
+		static unsigned long m_UartSupportedSpeeds[NUM_UART_SPEEDS];
 		
 		/****************************************************************************************
 		**  Constructors /  Destructor
