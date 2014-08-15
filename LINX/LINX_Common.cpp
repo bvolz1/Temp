@@ -160,7 +160,7 @@ int processCommand(unsigned char* commandPacketBuffer, unsigned char* responsePa
 		statusResponse(commandPacketBuffer, responsePacketBuffer, status);
 		break;
 	case 0x00E3: // I2C Read
-		status = LINXDev.I2CRead(commandPacketBuffer[6], commandPacketBuffer[7], &responsePacketBuffer[5]);
+		status = LINXDev.I2CRead(commandPacketBuffer[6], commandPacketBuffer[7], commandPacketBuffer[11], commandPacketBuffer[8],((commandPacketBuffer[9]<<8) | commandPacketBuffer[10]), &responsePacketBuffer[5]);
 		packetize(commandPacketBuffer, responsePacketBuffer, commandPacketBuffer[7], status); 		
 		break;
 	case 0x00E4: // I2C Close

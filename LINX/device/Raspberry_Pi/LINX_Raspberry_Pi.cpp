@@ -312,8 +312,21 @@ int LINXRaspberryPi::I2CWrite(unsigned char channel, unsigned char slaveAddress,
 	return L_OK;
 }
 
-int LINXRaspberryPi::I2CRead(unsigned char channel, unsigned char numBytes, unsigned char* recBuffer)
+int LINXRaspberryPi::I2CRead(unsigned char channel, unsigned char slaveAddress, unsigned char eofConfig, unsigned char numBytes, unsigned int timeout, unsigned char* recBuffer)
 {
+	//Check EOF - Currently Only Support 0x00
+	if(eofConfig != EOF_STOP)
+	{
+		return LI2C_EOF;	
+	}
+	
+	//Set Slave Address
+	if (ioctl(I2CHandles[channel], I2C_SLAVE, slaveAddress) < 0) 
+	{
+		//Failed To Set Slave Address
+		return LI2C_SADDR;
+	}
+	
 	if(read(I2CHandles[channel], recBuffer, numBytes) < numBytes)
 	{
 		return LI2C_READ_FAIL;	

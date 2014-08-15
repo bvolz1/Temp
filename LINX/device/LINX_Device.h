@@ -120,7 +120,7 @@ class LINXDevice
 		virtual int I2COpenMaster(unsigned char channel) = 0;
 		virtual int I2CSetSpeed(unsigned char channel, unsigned long speed, unsigned long* actualSpeed) = 0;
 		virtual int I2CWrite(unsigned char channel, unsigned char slaveAddress, unsigned char eofConfig, unsigned char numBytes, unsigned char* sendBuffer) = 0;
-		virtual int I2CRead(unsigned char channel, unsigned char numBytes, unsigned char* recBuffer) = 0;
+		virtual int I2CRead(unsigned char channel, unsigned char slaveAddress, unsigned char eofConfig, unsigned char numBytes, unsigned int timeout, unsigned char* recBuffer) = 0;
 		virtual int I2CClose(unsigned char channel) = 0;
 		
 		//General - 

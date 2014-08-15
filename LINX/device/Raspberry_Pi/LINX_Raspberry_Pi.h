@@ -62,7 +62,7 @@ class LINXRaspberryPi : public LINXDevice
 		int I2COpenMaster(unsigned char channel);
 		int I2CSetSpeed(unsigned char channel, unsigned long speed, unsigned long* actualSpeed);
 		int I2CWrite(unsigned char channel, unsigned char slaveAddress, unsigned char eofConfig, unsigned char numBytes, unsigned char* sendBuffer);
-		int I2CRead(unsigned char channel, unsigned char numBytes, unsigned char* recBuffer);
+		int I2CRead(unsigned char channel, unsigned char slaveAddress, unsigned char eofConfig, unsigned char numBytes, unsigned int timeout, unsigned char* recBuffer);
 		int I2CClose(unsigned char channel);
 		
 	private:
