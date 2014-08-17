@@ -119,7 +119,7 @@ int processCommand(unsigned char* commandPacketBuffer, unsigned char* responsePa
 	****************************************************************************************/	
 	case 0x0041: // Get Device Name
 		LINXDev.digitalWrite(commandPacketBuffer[6], &commandPacketBuffer[7], &commandPacketBuffer[7+commandPacketBuffer[6]]);
-		statusResponse(commandPacketBuffer, responsePacketBuffer, L_OK);
+		statusResponse(commandPacketBuffer, responsePacketBuffer, status);
 		break;
 		
 	/****************************************************************************************
@@ -130,10 +130,67 @@ int processCommand(unsigned char* commandPacketBuffer, unsigned char* responsePa
 		responsePacketBuffer[6] = (LINXDev.AIRef>>16) & 0xFF;		//...
 		responsePacketBuffer[7] = (LINXDev.AIRef>>8) & 0xFF;			//...
 		responsePacketBuffer[8] = LINXDev.AIRef & 0xFF;					//AIREF LSB
-		packetize(commandPacketBuffer, responsePacketBuffer, 4, L_OK); 
+		packetize(commandPacketBuffer, responsePacketBuffer, 4, status); 
 		break;
 		
+	/****************************************************************************************
+	** UART
+	****************************************************************************************/	
+	case 0x00C0: // UART Open
+	{
+		DEBUG("UART Open Command");
+		unsigned long targetBaud = (unsigned long)((commandPacketBuffer[7] << 24) | (commandPacketBuffer[8] << 16) | (commandPacketBuffer[9] << 8) | commandPacketBuffer[10]);
+		unsigned long actualBaud = 0;
 		
+		status = LINXDev.UartOpen(commandPacketBuffer[6], targetBaud, &actualBaud);
+		DEBUG("UART Open Command Returned...\n");
+		responsePacketBuffer[5] = (actualBaud>>24) & 0xFF;												//actualBaud MSB
+		responsePacketBuffer[6] = (actualBaud>>16) & 0xFF;												//...
+		responsePacketBuffer[7] = (actualBaud>>8) & 0xFF;												//...
+		responsePacketBuffer[8] = actualBaud & 0xFF;															//actualBaud LSB
+		packetize(commandPacketBuffer, responsePacketBuffer, 4, status); 
+		break;
+	}
+	case 0x00C1: // UART Set Buad Rate
+	{
+		unsigned long targetBaud = (unsigned long)((commandPacketBuffer[7] << 24) | (commandPacketBuffer[8] << 16) | (commandPacketBuffer[9] << 8) | commandPacketBuffer[10]);
+		unsigned long actualBaud = 0;
+		status = LINXDev.UartOpen(commandPacketBuffer[6], targetBaud, &actualBaud);
+		responsePacketBuffer[5] = (actualBaud>>24) & 0xFF;												//actualBaud MSB
+		responsePacketBuffer[6] = (actualBaud>>16) & 0xFF;												//...
+		responsePacketBuffer[7] = (actualBaud>>8) & 0xFF;												//...
+		responsePacketBuffer[8] = actualBaud & 0xFF;															//actualBaud LSB
+		packetize(commandPacketBuffer, responsePacketBuffer, 4, status); 
+		break;
+	}
+	case 0x00C2: // UART Get Bytes Available
+	{
+		unsigned char numBytes;
+		status = LINXDev.UartGetBytesAvailable(commandPacketBuffer[6], &numBytes);
+		responsePacketBuffer[5] = numBytes;	
+		packetize(commandPacketBuffer, responsePacketBuffer, 1, status); 		
+		break;
+	}
+	case 0x00C3: // UART Read
+	{
+		unsigned char numBytesRead;
+		status = LINXDev.UartRead(commandPacketBuffer[6], commandPacketBuffer[7], &responsePacketBuffer[5], &numBytesRead);
+		packetize(commandPacketBuffer, responsePacketBuffer, numBytesRead, status); 		
+		break;
+	}
+	case 0x00C4: // UART Write
+	{
+		status = LINXDev.UartWrite(commandPacketBuffer[6], (commandPacketBuffer[1]-8), &commandPacketBuffer[7]);
+		statusResponse(commandPacketBuffer, responsePacketBuffer, status);	
+		break;
+	}
+	case 0x00C5: // UART Close
+	{
+		status = LINXDev.UartClose(commandPacketBuffer[6]);
+		statusResponse(commandPacketBuffer, responsePacketBuffer, status);	
+		break;
+	}
+	
 	/****************************************************************************************
 	** I2C
 	****************************************************************************************/	

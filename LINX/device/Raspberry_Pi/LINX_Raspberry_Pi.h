@@ -39,6 +39,7 @@ class LINXRaspberryPi : public LINXDevice
 		const char (*UartPaths)[UART_PATH_LEN];		//UART Channel File Paths
 		unsigned char NumUartSpeeds;						///Number Of Support UART Buads
 		unsigned long* UartSupportedSpeeds;				//Supported UART Bauds Frequencies
+		unsigned long* UartSupportedSpeedsCodes;	//Supported UART Baud Divider Codes
 		
 		/****************************************************************************************
 		**  Constructors
@@ -76,7 +77,7 @@ class LINXRaspberryPi : public LINXDevice
 		int UartOpen(unsigned char channel, unsigned long baudRate, unsigned long* actualBaud);
 		int UartSetBaudRate(unsigned char channel, unsigned long baudRate, unsigned long* actualBaud);
 		int UartGetBytesAvailable(unsigned char channel, unsigned char *numBytes);
-		int UartRead(unsigned char channel, unsigned char numBytes, unsigned char* recBuffer);
+		int UartRead(unsigned char channel, unsigned char numBytes, unsigned char* recBuffer, unsigned char*numBytesRead);
 		int UartWrite(unsigned char channel, unsigned char numBytes, unsigned char* sendBuffer);
 		int UartClose(unsigned char channel);
 		

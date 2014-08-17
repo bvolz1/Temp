@@ -351,8 +351,9 @@ int LINXRaspberryPi::I2CClose(unsigned char channel)
 //UART
 int LINXRaspberryPi::UartOpen(unsigned char channel, unsigned long baudRate, unsigned long* actualBaud)
 {
-	//Open UART
-	int handle = open(UartPaths[channel],  O_RDWR | O_NOCTTY | O_NDELAY);
+	//Open UART	
+	int handle = open(UartPaths[channel],  O_RDWR | O_NDELAY);
+	
 	if (handle < 0)
 	{
 		DEBUG("Failed To Open UART Channel");
@@ -387,13 +388,14 @@ int LINXRaspberryPi::UartSetBaudRate(unsigned char channel, unsigned long baudRa
 	}
 	
 	//Store Actual Baud Used
-	*actualBaud = *(UartSupportedSpeeds+index);
+	*actualBaud = (unsigned long) *(UartSupportedSpeeds+index);
+	printf("Baud = %d\n", *(UartSupportedSpeeds+index));
 	
 	//Set Baud Rate
 	struct termios options;	
 	tcgetattr(UartHandles[channel], &options);
 	
-	options.c_cflag = *(SPISupportedSpeeds+index) | CS8 | CLOCAL | CREAD;
+	options.c_cflag = *(UartSupportedSpeedsCodes+index) | CS8 | CLOCAL | CREAD;
 	options.c_iflag = IGNPAR;
 	options.c_oflag = 0;
 	options.c_lflag = 0;
@@ -406,20 +408,69 @@ int LINXRaspberryPi::UartSetBaudRate(unsigned char channel, unsigned long baudRa
 
 int LINXRaspberryPi::UartGetBytesAvailable(unsigned char channel, unsigned char *numBytes)
 {
+	int bytesAtPort = -1;
+	ioctl(UartHandles[channel], FIONREAD, &bytesAtPort);
+	
+	printf("/n Bytes Avail = %d\n", bytesAtPort);
+	
+	if(bytesAtPort < 0)
+	{
+		return LUART_AVAILABLE_FAIL;
+	}
+	else
+	{
+		*numBytes = (unsigned char) bytesAtPort;
+	}
 	return  L_OK;
 }
 
-int LINXRaspberryPi::UartRead(unsigned char channel, unsigned char numBytes, unsigned char* recBuffer)
+int LINXRaspberryPi::UartRead(unsigned char channel, unsigned char numBytes, unsigned char* recBuffer, unsigned char* numBytesRead)
 {
+	//Check If Enough Bytes Are Available
+	unsigned char bytesAvailable = -1;
+	UartGetBytesAvailable(channel, &bytesAvailable);
+	
+	if(bytesAvailable >= numBytes)
+	{
+		//Read Bytes From Input Buffer
+		int bytesRead = read(UartHandles[channel], recBuffer, numBytes);
+		*numBytesRead = (unsigned char) bytesRead;
+		
+		if(bytesRead != numBytes)
+		{
+			return LUART_READ_FAIL;
+		}		
+	}
 	return  L_OK;
 }
 
 int LINXRaspberryPi::UartWrite(unsigned char channel, unsigned char numBytes, unsigned char* sendBuffer)
 {
+	
+	//debug
+	printf("\n");
+	for(int i=0; i< numBytes; i++)
+	{
+		printf("%c", *(sendBuffer+i));
+	}
+		printf("\n");
+	
+	
+	
+	int bytesSent = write(UartHandles[channel], sendBuffer, numBytes);	
+	if(bytesSent != numBytes)
+	{
+		return LUART_WRITE_FAIL;
+	}
 	return  L_OK;
 }
 
 int LINXRaspberryPi::UartClose(unsigned char channel)
 {
+	//Close UART Channel, Return OK or Error
+	if (close(UartHandles[channel]) < 0)
+	{
+		return LUART_CLOSE_FAIL;
+	}
 	return  L_OK;
 }

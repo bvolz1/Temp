@@ -43,7 +43,12 @@ typedef enum I2CStatus
 
 typedef enum UartStatus
 {
-	LUART_OPEN_FAIL=128
+	LUART_OPEN_FAIL=128, 
+	LUART_SET_BAUD_FAIL, 
+	LUART_AVAILABLE_FAIL, 
+	LUART_READ_FAIL, 
+	LUART_WRITE_FAIL, 
+	LUART_CLOSE_FAIL
 }UartStatus;
 
 class LINXDevice
@@ -133,7 +138,7 @@ class LINXDevice
 		virtual int UartOpen(unsigned char channel, unsigned long baudRate, unsigned long* actualBaud) = 0;
 		virtual int UartSetBaudRate(unsigned char channel, unsigned long baudRate, unsigned long* actualBaud) = 0;
 		virtual int UartGetBytesAvailable(unsigned char channel, unsigned char *numBytes) = 0;
-		virtual int UartRead(unsigned char channel, unsigned char numBytes, unsigned char* recBuffer) = 0;
+		virtual int UartRead(unsigned char channel, unsigned char numBytes, unsigned char* recBuffer, unsigned char* numBytesRead) = 0;
 		virtual int UartWrite(unsigned char channel, unsigned char numBytes, unsigned char* sendBuffer) = 0;
 		virtual int UartClose(unsigned char channel) = 0;
 		

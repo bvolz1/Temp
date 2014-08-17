@@ -51,6 +51,7 @@ class LINXRaspberryPi_B : public LINXRaspberryPi
 		static int m_UartHandles[NUM_UART_CHANS];
 		static const char m_UartPaths[NUM_UART_CHANS][UART_PATH_LEN];
 		static unsigned long m_UartSupportedSpeeds[NUM_UART_SPEEDS];
+		static unsigned long m_UartSupportedSpeedsCodes[NUM_UART_SPEEDS];
 		
 		/****************************************************************************************
 		**  Constructors /  Destructor
