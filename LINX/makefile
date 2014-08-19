@@ -6,8 +6,8 @@ release:
 debug:
 	g++ LINX_Daemon.cpp LINX_Networking.cpp LINX_Common.cpp device/LINX_Device.cpp device/Raspberry_Pi/LINX_Raspberry_Pi.cpp device/Raspberry_Pi/LINX_Raspberry_Pi_B.cpp -lrt -DDEBUG_ENABLED=1 -o LINX_Debug.out
 	
-test:
-	g++ test.cpp LINX_Common.cpp -o test
+ArduinoSerial:
+	g++ LinxSerial.cpp LinxSerialDaemon.cpp LINX_Common.cpp device/LINX_Device.cpp device/Arduino/ArduinoSerialDaemon.cpp -lrt  -DDEBUG_ENABLED=1 -o LinxSerial.out
 
 clean:
 	rm -rf *.o
