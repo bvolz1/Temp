@@ -7,9 +7,9 @@
 #include <unistd.h>
 #include <netinet/in.h>
 
-#include "LINX_Common.h"
-#include "LINX_Networking.h"
-#include "device/LINX_Device.h"
+#include "../common/LinxCommon.h"
+#include "LinxTcp.h"
+#include "../device/LinxDevice.h"
 
 /****************************************************************************************
 **  Constructors

@@ -1,7 +1,7 @@
 #ifndef LINX_NETWORKING_H
 
 #define LINX_NETWORKING_H
-#include "device/LINX_Device.h"
+#include "../device/LinxDevice.h"
 
 #ifndef PACKET_BUFFER_SIZE
 	#define PACKET_BUFFER_SIZE 64

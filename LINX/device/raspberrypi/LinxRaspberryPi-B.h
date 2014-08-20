@@ -19,7 +19,7 @@
 /****************************************************************************************
 **  Includes
 ****************************************************************************************/		
-#include "LINX_Raspberry_Pi.h"
+#include "LinxRaspberryPi.h"
 	
 class LINXRaspberryPi_B : public LINXRaspberryPi
 {

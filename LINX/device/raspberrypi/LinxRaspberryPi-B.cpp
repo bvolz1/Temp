@@ -1,13 +1,13 @@
 /****************************************************************************************
 **  Includes
 ****************************************************************************************/		
-#include "../../LINX_Common.h"
-#include "../LINX_Device.h"
-#include "LINX_Raspberry_Pi_B.h"
-
 #include <stdio.h>
 #include <string>
 #include <termios.h>		//UART Support
+
+#include "../../common/LinxCommon.h"
+#include "../LinxDevice.h"
+#include "LinxRaspberryPi-B.h"
 
 /****************************************************************************************
 **  Member Variables

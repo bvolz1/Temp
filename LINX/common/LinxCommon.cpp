@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include "LINX_Common.h"
 
-#include "device/LINX_Device.h"
+#include "LinxCommon.h"
+#include "../device/LinxDevice.h"
 
 unsigned long getSeconds()
 {

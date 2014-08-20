@@ -5,7 +5,7 @@
 **  Includes
 ****************************************************************************************/		
 #include <string>
-#include "../LINX_Device.h"
+#include "../LinxDevice.h"
 
 
 #define SPI_PATH_LEN 64
