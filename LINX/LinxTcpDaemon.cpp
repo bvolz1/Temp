@@ -13,7 +13,7 @@
 #include <unistd.h>
 #include <netinet/in.h>
 
-#include "common/LinxCommon.h"
+#include "LinxCommon.h"
 #include "device/LinxDevice.h"
 #include "device/raspberrypi/LinxRaspberryPi-B.h"
 
@@ -40,28 +40,34 @@ int main(int argc, char *argv[])
 		{
 			case START:
 				DEBUG("Start State");
-				LinxServer.begin(6999);
+				LinxServer.Start(6999);
 				break;
 			
 			case LISTENING:
 				DEBUG("Listening State");
-				LinxServer.acceptConnection();
-				break;					
+				LinxServer.Accept();
+				break;	
+			
+			case AVAILABLE:
+				break;
+				
+			case ACCEPT:
+				break;
 				
 			case CONNECTED:
 				DEBUG("Connected State");
-				LinxServer.processPackets(LinxDev);
+				LinxServer.Connected(LinxDev);
 				break;
 
 			case CLOSE:
 				DEBUG("Restarting LINX Server");
-				LinxServer.stop();
+				LinxServer.Close();
 				LinxServer.State = START;
 				break;					
 				
 			case EXIT:
 				DEBUG("Exit State\n");
-				LinxServer.stop();
+				LinxServer.Exit();
 				exit(-1);
 				break;				
 		}

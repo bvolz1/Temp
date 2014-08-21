@@ -1,17 +1,14 @@
+/****************************************************************************************
+** Includes
+****************************************************************************************/
 #include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
 
-#include "LinxCommon.h"
-#include "../device/LinxDevice.h"
+#include "../LinxCommon.h"
+#include "LinxListenerCommon.h"
 
-unsigned long GetSeconds()
-{
-	timespec mTime;
-	clock_gettime(CLOCK_MONOTONIC, &mTime);	
-	return mTime.tv_sec;
-}
-
+/****************************************************************************************
+** Functions
+****************************************************************************************/
 unsigned char ComputeChecksum(unsigned char* packetBuffer)
 {  
   unsigned char checksum = 0;
@@ -310,28 +307,3 @@ void DataBufferResponse(unsigned char* commandPacketBuffer, unsigned char* respo
 	
 	PacketizeAndSend(commandPacketBuffer, responsePacketBuffer, dataSize, status);
 }
-
-//DEBUG
-#ifdef DEBUG_ENABLED
-	void DebugPrintCmdPacket(unsigned char* packetBuffer)
-	{
-		fprintf(stdout, "Received : ");		
-		for(int i =0; i<packetBuffer[1]; i++)
-		{
-			fprintf(stdout, "[%X] ", packetBuffer[i]);
-		}	
-		fprintf(stdout, "\n");
-	}
-#endif //DEBUG_ENABLED
-
-#ifdef DEBUG_ENABLED
-void DebugPrintResPacket(unsigned char* packetBuffer)
-{
-	fprintf(stdout, "Replying With : ");
-	for(int i=0; i<packetBuffer[1]; i++)
-	{
-		fprintf(stdout, "[%X] ", packetBuffer[i]);
-	}	
-	fprintf(stdout, "\n");
-}
-#endif //DEBUG_ENABLED

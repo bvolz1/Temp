@@ -39,13 +39,13 @@ class LinxTcpListener
 		/****************************************************************************************
 		**  Functions
 		****************************************************************************************/		
-		virtual int Start();
-		virtual int Listen();
-		virtual int Available();
-		virtual int Accept();
-		virtual int Connected();
-		virtual int Close();
-		virtual int Exit();
+		virtual int Start();			//Start TCP Stack
+		virtual int Listen();			//Listen For Connection
+		virtual int Available();		//New Client Connection Available
+		virtual int Accept();		//Accept New Client Connection
+		virtual int Connected();	//Connected To Client
+		virtual int Close();			//Close Client Connection
+		virtual int Exit();			//Stop Listening, Close And Exit
 		
 	private:
 		/****************************************************************************************

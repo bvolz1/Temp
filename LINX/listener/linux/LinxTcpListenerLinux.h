@@ -45,10 +45,10 @@ class LinxTcpListenerLinux : public LinxTcpListener
 		/****************************************************************************************
 		**  Functions
 		****************************************************************************************/
-		int begin(unsigned int serverPort);
-		int acceptConnection();
-		int processPackets(LinxDevice &linxDev);
-		int stop();
+		int Start(unsigned int serverPort);
+		int Accept();
+		int Connected(LinxDevice &linxDev);
+		int Exit();
 	
 	private:
 		/****************************************************************************************
@@ -59,7 +59,7 @@ class LinxTcpListenerLinux : public LinxTcpListener
 		/****************************************************************************************
 		**  Functions
 		****************************************************************************************/
-		int peek(unsigned char * recBuffer, int bufferSize);
+		int Peek(unsigned char * recBuffer, int bufferSize);
 		
 };
 

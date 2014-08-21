@@ -4,7 +4,7 @@
 /****************************************************************************************
 ** Includes
 ****************************************************************************************/
-#include "../device/LinxDevice.h"
+#include "device/LinxDevice.h"
 
 /****************************************************************************************
 ** Defines
@@ -27,14 +27,6 @@ enum LinxStatus {L_OK, L_FUNCTION_NOT_SUPPORTED, L_REQUEST_RESEND, L_UNKNOWN_ERR
 /****************************************************************************************
 ** Functions
 ****************************************************************************************/
-//LINX Helpers
-int ProcessCommand(unsigned char* recBuffer, unsigned char* sendBuffer, LinxDevice& LinxDev);
-void PacketizeAndSend(unsigned char* commandPacketBuffer, unsigned char* responsePacketBuffer, unsigned int dataSize, int status);
-void StatusResponse(unsigned char* commandPacketBuffer, unsigned char* responsePacketBuffer, int status);
-void DataBufferResponse(unsigned char* commandPacketBuffer, unsigned char* responsePacketBuffer, const unsigned char* dataBuffer, unsigned char dataSize, int status);
-unsigned char ComputeChecksum(unsigned char* packetBuffer);
-bool ChecksumPassed(unsigned char* packetBuffer);
-
 //Debugging
 void DebugPrint(char* message);
 void DebugPrintCmdPacket(unsigned char* packetBuffer);

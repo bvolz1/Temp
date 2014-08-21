@@ -16,7 +16,7 @@
 
 #include <termios.h>		//UART Support
 
-#include "../../common/LinxCommon.h"
+#include "../../LinxCommon.h"
 #include "../LinxDevice.h"
 #include "LinxRaspberryPi.h"
 

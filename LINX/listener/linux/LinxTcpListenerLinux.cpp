@@ -10,7 +10,9 @@
 #include <unistd.h>
 #include <netinet/in.h>
 
-#include "../../common/LinxCommon.h"
+
+#include "../../LinxCommon.h"
+#include "../LinxListenerCommon.h"
 #include "../../device/LinxDevice.h"
 #include "LinxTcpListenerLinux.h"
 
@@ -28,7 +30,7 @@ LinxTcpListenerLinux::LinxTcpListenerLinux()
 **  Functions
 ****************************************************************************************/
 
-int LinxTcpListenerLinux::begin(unsigned int serverPort)
+int LinxTcpListenerLinux::Start(unsigned int serverPort)
 {
 	DEBUG("Starting LINX TCP Server!");
 	
@@ -43,9 +45,7 @@ int LinxTcpListenerLinux::begin(unsigned int serverPort)
 	{
 		DEBUG("Successfully Created Socket");
 	}
-	
-	
-	
+
 	//Construct the server sockaddr_in structure
 	memset(&echoserver, 0, sizeof(echoserver));			//Clear Struct
 	echoserver.sin_family = AF_INET;							//Internet/IP
@@ -80,7 +80,7 @@ int LinxTcpListenerLinux::begin(unsigned int serverPort)
 	return 0;
 }
 
-int LinxTcpListenerLinux::acceptConnection()
+int LinxTcpListenerLinux::Accept()
 {
 	DEBUG("Waiting For Client Connection\n");
 	
@@ -111,7 +111,7 @@ int LinxTcpListenerLinux::acceptConnection()
 	return 0;	
 }
 
-int LinxTcpListenerLinux::processPackets(LinxDevice &linxDev)
+int LinxTcpListenerLinux::Connected(LinxDevice &linxDev)
 {	
 	int received = -1;
 	unsigned char packetSize = 0;
@@ -121,7 +121,7 @@ int LinxTcpListenerLinux::processPackets(LinxDevice &linxDev)
 	recBuffer[0] = 0;
 	
 	//Watch For New Packet
-	received = peek(recBuffer, PACKET_BUFFER_SIZE);
+	received = Peek(recBuffer, PACKET_BUFFER_SIZE);
 	
 	//Wait For At Least First Two Bytes Of Packet
 	if(received >= 2)
@@ -197,7 +197,7 @@ int LinxTcpListenerLinux::processPackets(LinxDevice &linxDev)
 	}
 }
 
-int LinxTcpListenerLinux::stop()
+int LinxTcpListenerLinux::Exit()
 {
 	close(serversock);
 	close(clientsock);
@@ -205,7 +205,7 @@ int LinxTcpListenerLinux::stop()
 	return 0;
 }
 
-int LinxTcpListenerLinux::peek(unsigned char * recBuffer, int bufferSize)
+int LinxTcpListenerLinux::Peek(unsigned char * recBuffer, int bufferSize)
 {
 	int peekReceived = -1;
 	errno = 0;
