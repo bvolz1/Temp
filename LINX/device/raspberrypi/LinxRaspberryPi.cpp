@@ -34,9 +34,9 @@ LinxRaspberryPi::LinxRaspberryPi( )
 	DeviceFamily = 0x04;
 	
 	//LINX API Version
-	LinxAPIMajor = 1;
-	LinxAPIMinor = 1;
-	LinxAPISubminor = 0;	
+	LinxApiMajor = 1;
+	LinxApiMinor = 1;
+	LinxApiSubminor = 0;	
 }
 
 

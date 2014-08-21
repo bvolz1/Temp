@@ -50,9 +50,9 @@ LinxRaspberryPiB::LinxRaspberryPiB()
 	DeviceName =  m_DeviceName;
 
 	//LINX API Version
-	LinxAPIMajor = 1;
-	LinxAPIMinor = 1;
-	LinxAPISubminor = 0;
+	LinxApiMajor = 1;
+	LinxApiMinor = 1;
+	LinxApiSubminor = 0;
 	
 	//DIGITAL
 	NumDigitalChans = NUM_DIGITAL_CHANS;			

@@ -3,7 +3,7 @@
 #include "device/LinxDevice.h"
 #include "device/raspberrypi/LinxRaspberryPi-B.h"
 
-LinxRaspberryPiB LINXDev;	
+LinxRaspberryPiB m_SPIChans;	
 
 int main(int argc, char *argv[])
 {

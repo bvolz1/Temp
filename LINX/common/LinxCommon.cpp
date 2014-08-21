@@ -5,14 +5,14 @@
 #include "LinxCommon.h"
 #include "../device/LinxDevice.h"
 
-unsigned long getSeconds()
+unsigned long GetSeconds()
 {
 	timespec mTime;
 	clock_gettime(CLOCK_MONOTONIC, &mTime);	
 	return mTime.tv_sec;
 }
 
-unsigned char computeChecksum(unsigned char* packetBuffer)
+unsigned char ComputeChecksum(unsigned char* packetBuffer)
 {  
   unsigned char checksum = 0;
   
@@ -25,19 +25,19 @@ unsigned char computeChecksum(unsigned char* packetBuffer)
 }
 
 
-bool checksumPassed(unsigned char* packetBuffer)
+bool ChecksumPassed(unsigned char* packetBuffer)
 {
-  return (computeChecksum(packetBuffer) == packetBuffer[packetBuffer[1]-1]);
+  return (ComputeChecksum(packetBuffer) == packetBuffer[packetBuffer[1]-1]);
 }
 
 
-void statusResponse(unsigned char* commandPacketBuffer, unsigned char* responsePacketBuffer, int status)
+void StatusResponse(unsigned char* commandPacketBuffer, unsigned char* responsePacketBuffer, int status)
 {
-	packetize(commandPacketBuffer, responsePacketBuffer, 0, status); 
+	PacketizeAndSend(commandPacketBuffer, responsePacketBuffer, 0, status); 
 }
 
 
-int processCommand(unsigned char* commandPacketBuffer, unsigned char* responsePacketBuffer, LINXDevice &LINXDev)
+int ProcessCommand(unsigned char* commandPacketBuffer, unsigned char* responsePacketBuffer, LinxDevice &linxDev)
 {
 	DEBUGCMDPACKET(commandPacketBuffer);
 		
@@ -54,56 +54,56 @@ int processCommand(unsigned char* commandPacketBuffer, unsigned char* responsePa
     * SYSTEM COMMANDS
     ************************************************************************************/
 	case 0x0000: // Sync Packet        
-		statusResponse(commandPacketBuffer, responsePacketBuffer, L_OK);
+		StatusResponse(commandPacketBuffer, responsePacketBuffer, L_OK);
 		break;
 	 
 	case 0x0003: // Get Device ID     
-		responsePacketBuffer[5] = LINXDev.deviceFamily;
-		responsePacketBuffer[6] = LINXDev.deviceID;    
-		packetize(commandPacketBuffer, responsePacketBuffer, 2, L_OK); 
+		responsePacketBuffer[5] = linxDev.DeviceFamily;
+		responsePacketBuffer[6] = linxDev.DeviceID;    
+		PacketizeAndSend(commandPacketBuffer, responsePacketBuffer, 2, L_OK); 
 		break;	
 		
 	case 0x0004: //Get LINX API Version
-		responsePacketBuffer[5] = LINXDev.linxAPIMajor;
-		responsePacketBuffer[6] = LINXDev.linxAPIMinor;
-		responsePacketBuffer[7] = LINXDev.linxAPISubminor;   
-		packetize(commandPacketBuffer, responsePacketBuffer, 3, L_OK); 
+		responsePacketBuffer[5] = linxDev.LinxApiMajor;
+		responsePacketBuffer[6] = linxDev.LinxApiMinor;
+		responsePacketBuffer[7] = linxDev.LinxApiSubminor;   
+		PacketizeAndSend(commandPacketBuffer, responsePacketBuffer, 3, L_OK); 
 		break;
 		
 	case 0x0008: // Get DIO Channels
-		dataBufferResponse(commandPacketBuffer, responsePacketBuffer, LINXDev.DIOChans, LINXDev.numDIOChans, L_OK);
+		DataBufferResponse(commandPacketBuffer, responsePacketBuffer, linxDev.DigitalChans, linxDev.NumDigitalChans, L_OK);
 		break;
 	
 	case 0x0009: // Get AI Channels
-        dataBufferResponse(commandPacketBuffer, responsePacketBuffer, LINXDev.AIChans, LINXDev.numAIChans, L_OK);
+        DataBufferResponse(commandPacketBuffer, responsePacketBuffer, linxDev.AiChans, linxDev.NumAiChans, L_OK);
        break;
 	   
     case 0x000A: // Get AO Channels
-        dataBufferResponse(commandPacketBuffer, responsePacketBuffer, LINXDev.AOChans, LINXDev.numAOChans, L_OK);
+        DataBufferResponse(commandPacketBuffer, responsePacketBuffer, linxDev.AoChans, linxDev.NumAoChans, L_OK);
        break;
 	   
     case 0x000B: // Get PWM Channels
-        dataBufferResponse(commandPacketBuffer, responsePacketBuffer, LINXDev.PWMChans, LINXDev.numPWMChans, L_OK);
+        DataBufferResponse(commandPacketBuffer, responsePacketBuffer, linxDev.PwmChans, linxDev.NumPwmChans, L_OK);
        break;
 	   
     case 0x000C: // Get QE Channels
-        dataBufferResponse(commandPacketBuffer, responsePacketBuffer, LINXDev.QEChans, LINXDev.numQEChans, L_OK);
+        DataBufferResponse(commandPacketBuffer, responsePacketBuffer, linxDev.QeChans, linxDev.NumQeChans, L_OK);
        break;
 	   
     case 0x000D: // Get UART Channels
-       dataBufferResponse(commandPacketBuffer, responsePacketBuffer, LINXDev.UartChans, LINXDev.NumUartChans, L_OK);
+       DataBufferResponse(commandPacketBuffer, responsePacketBuffer, linxDev.UartChans, linxDev.NumUartChans, L_OK);
        break;
 	   
     case 0x000E: // Get I2C Channels
-       dataBufferResponse(commandPacketBuffer, responsePacketBuffer, LINXDev.I2CChans, LINXDev.numI2CChans, L_OK);
+       DataBufferResponse(commandPacketBuffer, responsePacketBuffer, linxDev.I2cChans, linxDev.NumI2cChans, L_OK);
        break;
 	   
     case 0x000F: // Get SPI Channels
-       dataBufferResponse(commandPacketBuffer, responsePacketBuffer, LINXDev.SPIChans, LINXDev.numSPIChans, L_OK);
+       DataBufferResponse(commandPacketBuffer, responsePacketBuffer, linxDev.SpiChans, linxDev.NumSpiChans, L_OK);
        break;
 	   
     case 0x0010: // Get CAN Channels
-        dataBufferResponse(commandPacketBuffer, responsePacketBuffer, LINXDev.CANChans, LINXDev.numCANChans, L_OK);
+        DataBufferResponse(commandPacketBuffer, responsePacketBuffer, linxDev.CanChans, linxDev.NumCanChans, L_OK);
        break;
 		
 	case 0x0011: // Disconnect
@@ -111,26 +111,26 @@ int processCommand(unsigned char* commandPacketBuffer, unsigned char* responsePa
 		break;
 		
 	case 0x0024: // Get Device Name
-		dataBufferResponse(commandPacketBuffer, responsePacketBuffer, LINXDev.deviceName, LINXDev.deviceNameLen, L_OK);
+		DataBufferResponse(commandPacketBuffer, responsePacketBuffer, linxDev.DeviceName, linxDev.DeviceNameLen, L_OK);
 		break;
 	
 	/****************************************************************************************
 	**  Digital I/O
 	****************************************************************************************/	
 	case 0x0041: // Get Device Name
-		LINXDev.digitalWrite(commandPacketBuffer[6], &commandPacketBuffer[7], &commandPacketBuffer[7+commandPacketBuffer[6]]);
-		statusResponse(commandPacketBuffer, responsePacketBuffer, status);
+		linxDev.DigitalWrite(commandPacketBuffer[6], &commandPacketBuffer[7], &commandPacketBuffer[7+commandPacketBuffer[6]]);
+		StatusResponse(commandPacketBuffer, responsePacketBuffer, status);
 		break;
 		
 	/****************************************************************************************
 	**  Analog I/O
 	****************************************************************************************/	
 	case 0x0061: // Get AI Reference Voltage
-		responsePacketBuffer[5] = (LINXDev.AIRef>>24) & 0xFF;		//AIREF MSB
-		responsePacketBuffer[6] = (LINXDev.AIRef>>16) & 0xFF;		//...
-		responsePacketBuffer[7] = (LINXDev.AIRef>>8) & 0xFF;			//...
-		responsePacketBuffer[8] = LINXDev.AIRef & 0xFF;					//AIREF LSB
-		packetize(commandPacketBuffer, responsePacketBuffer, 4, status); 
+		responsePacketBuffer[5] = (linxDev.AiRef>>24) & 0xFF;		//AIREF MSB
+		responsePacketBuffer[6] = (linxDev.AiRef>>16) & 0xFF;		//...
+		responsePacketBuffer[7] = (linxDev.AiRef>>8) & 0xFF;			//...
+		responsePacketBuffer[8] = linxDev.AiRef & 0xFF;					//AIREF LSB
+		PacketizeAndSend(commandPacketBuffer, responsePacketBuffer, 4, status); 
 		break;
 		
 	/****************************************************************************************
@@ -142,52 +142,52 @@ int processCommand(unsigned char* commandPacketBuffer, unsigned char* responsePa
 		unsigned long targetBaud = (unsigned long)((commandPacketBuffer[7] << 24) | (commandPacketBuffer[8] << 16) | (commandPacketBuffer[9] << 8) | commandPacketBuffer[10]);
 		unsigned long actualBaud = 0;
 		
-		status = LINXDev.UartOpen(commandPacketBuffer[6], targetBaud, &actualBaud);
+		status = linxDev.UartOpen(commandPacketBuffer[6], targetBaud, &actualBaud);
 		DEBUG("UART Open Command Returned...\n");
 		responsePacketBuffer[5] = (actualBaud>>24) & 0xFF;												//actualBaud MSB
 		responsePacketBuffer[6] = (actualBaud>>16) & 0xFF;												//...
 		responsePacketBuffer[7] = (actualBaud>>8) & 0xFF;												//...
 		responsePacketBuffer[8] = actualBaud & 0xFF;															//actualBaud LSB
-		packetize(commandPacketBuffer, responsePacketBuffer, 4, status); 
+		PacketizeAndSend(commandPacketBuffer, responsePacketBuffer, 4, status); 
 		break;
 	}
 	case 0x00C1: // UART Set Buad Rate
 	{
 		unsigned long targetBaud = (unsigned long)((commandPacketBuffer[7] << 24) | (commandPacketBuffer[8] << 16) | (commandPacketBuffer[9] << 8) | commandPacketBuffer[10]);
 		unsigned long actualBaud = 0;
-		status = LINXDev.UartOpen(commandPacketBuffer[6], targetBaud, &actualBaud);
+		status = linxDev.UartOpen(commandPacketBuffer[6], targetBaud, &actualBaud);
 		responsePacketBuffer[5] = (actualBaud>>24) & 0xFF;												//actualBaud MSB
 		responsePacketBuffer[6] = (actualBaud>>16) & 0xFF;												//...
 		responsePacketBuffer[7] = (actualBaud>>8) & 0xFF;												//...
 		responsePacketBuffer[8] = actualBaud & 0xFF;															//actualBaud LSB
-		packetize(commandPacketBuffer, responsePacketBuffer, 4, status); 
+		PacketizeAndSend(commandPacketBuffer, responsePacketBuffer, 4, status); 
 		break;
 	}
 	case 0x00C2: // UART Get Bytes Available
 	{
 		unsigned char numBytes;
-		status = LINXDev.UartGetBytesAvailable(commandPacketBuffer[6], &numBytes);
+		status = linxDev.UartGetBytesAvailable(commandPacketBuffer[6], &numBytes);
 		responsePacketBuffer[5] = numBytes;	
-		packetize(commandPacketBuffer, responsePacketBuffer, 1, status); 		
+		PacketizeAndSend(commandPacketBuffer, responsePacketBuffer, 1, status); 		
 		break;
 	}
 	case 0x00C3: // UART Read
 	{
 		unsigned char numBytesRead;
-		status = LINXDev.UartRead(commandPacketBuffer[6], commandPacketBuffer[7], &responsePacketBuffer[5], &numBytesRead);
-		packetize(commandPacketBuffer, responsePacketBuffer, numBytesRead, status); 		
+		status = linxDev.UartRead(commandPacketBuffer[6], commandPacketBuffer[7], &responsePacketBuffer[5], &numBytesRead);
+		PacketizeAndSend(commandPacketBuffer, responsePacketBuffer, numBytesRead, status); 		
 		break;
 	}
 	case 0x00C4: // UART Write
 	{
-		status = LINXDev.UartWrite(commandPacketBuffer[6], (commandPacketBuffer[1]-8), &commandPacketBuffer[7]);
-		statusResponse(commandPacketBuffer, responsePacketBuffer, status);	
+		status = linxDev.UartWrite(commandPacketBuffer[6], (commandPacketBuffer[1]-8), &commandPacketBuffer[7]);
+		StatusResponse(commandPacketBuffer, responsePacketBuffer, status);	
 		break;
 	}
 	case 0x00C5: // UART Close
 	{
-		status = LINXDev.UartClose(commandPacketBuffer[6]);
-		statusResponse(commandPacketBuffer, responsePacketBuffer, status);	
+		status = linxDev.UartClose(commandPacketBuffer[6]);
+		StatusResponse(commandPacketBuffer, responsePacketBuffer, status);	
 		break;
 	}
 	
@@ -195,79 +195,79 @@ int processCommand(unsigned char* commandPacketBuffer, unsigned char* responsePa
 	** I2C
 	****************************************************************************************/	
 	case 0x00E0: // I2C Open Master
-		status = LINXDev.I2COpenMaster(commandPacketBuffer[6]);
-		statusResponse(commandPacketBuffer, responsePacketBuffer, status);
+		status = linxDev.I2cOpenMaster(commandPacketBuffer[6]);
+		StatusResponse(commandPacketBuffer, responsePacketBuffer, status);
 		break;
 	case 0x00E1: // I2C Set Speed
 	{
 		unsigned long targetSpeed = (unsigned long)((commandPacketBuffer[7] << 24) | (commandPacketBuffer[8] << 16) | (commandPacketBuffer[9] << 8) | commandPacketBuffer[10]);
 		unsigned long actualSpeed = 0;
-		status = LINXDev.I2CSetSpeed(commandPacketBuffer[6], targetSpeed, &actualSpeed);
+		status = linxDev.I2cSetSpeed(commandPacketBuffer[6], targetSpeed, &actualSpeed);
 		
 		//Build Response Packet
 		responsePacketBuffer[5] = (actualSpeed>>24) & 0xFF;		//Actual Speed MSB
 		responsePacketBuffer[6] = (actualSpeed>>16) & 0xFF;		//...
 		responsePacketBuffer[7] = (actualSpeed>>8) & 0xFF;			//...
 		responsePacketBuffer[8] = actualSpeed & 0xFF;					//Actual Speed LSB		
-		packetize(commandPacketBuffer, responsePacketBuffer, 4, status); 
+		PacketizeAndSend(commandPacketBuffer, responsePacketBuffer, 4, status); 
 		break;
 	}
 	case 0x00E2: // I2C Write
-		status = LINXDev.I2CWrite(commandPacketBuffer[6], commandPacketBuffer[7], commandPacketBuffer[8], (commandPacketBuffer[1]-10), &commandPacketBuffer[9]);
-		statusResponse(commandPacketBuffer, responsePacketBuffer, status);
+		status = linxDev.I2cWrite(commandPacketBuffer[6], commandPacketBuffer[7], commandPacketBuffer[8], (commandPacketBuffer[1]-10), &commandPacketBuffer[9]);
+		StatusResponse(commandPacketBuffer, responsePacketBuffer, status);
 		break;
 	case 0x00E3: // I2C Read
-		status = LINXDev.I2CRead(commandPacketBuffer[6], commandPacketBuffer[7], commandPacketBuffer[11], commandPacketBuffer[8],((commandPacketBuffer[9]<<8) | commandPacketBuffer[10]), &responsePacketBuffer[5]);
-		packetize(commandPacketBuffer, responsePacketBuffer, commandPacketBuffer[7], status); 		
+		status = linxDev.I2cRead(commandPacketBuffer[6], commandPacketBuffer[7], commandPacketBuffer[11], commandPacketBuffer[8],((commandPacketBuffer[9]<<8) | commandPacketBuffer[10]), &responsePacketBuffer[5]);
+		PacketizeAndSend(commandPacketBuffer, responsePacketBuffer, commandPacketBuffer[7], status); 		
 		break;
 	case 0x00E4: // I2C Close
-		status = LINXDev.I2CClose((commandPacketBuffer[6]));
-		statusResponse(commandPacketBuffer, responsePacketBuffer, status);
+		status = linxDev.I2cClose((commandPacketBuffer[6]));
+		StatusResponse(commandPacketBuffer, responsePacketBuffer, status);
 		break;
 		
 	/****************************************************************************************
 	** SPI
 	****************************************************************************************/	
 	case 0x0100: // SPI Open Master
-		LINXDev.SPIOpenMaster(commandPacketBuffer[6]);
-		statusResponse(commandPacketBuffer, responsePacketBuffer, L_OK);
+		linxDev.SpiOpenMaster(commandPacketBuffer[6]);
+		StatusResponse(commandPacketBuffer, responsePacketBuffer, L_OK);
 		break;
 	case 0x0101: // SPI Set Bit Order
-		LINXDev.SPISetBitOrder(commandPacketBuffer[6], commandPacketBuffer[7]);
-		statusResponse(commandPacketBuffer, responsePacketBuffer, L_OK);
+		linxDev.SpiSetBitOrder(commandPacketBuffer[6], commandPacketBuffer[7]);
+		StatusResponse(commandPacketBuffer, responsePacketBuffer, L_OK);
 		break;
 		
 	case 0x0102: // SPI Set Clock Frequency				
 	{
 		unsigned long targetSpeed = (unsigned long)((commandPacketBuffer[7] << 24) | (commandPacketBuffer[8] << 16) | (commandPacketBuffer[9] << 8) | commandPacketBuffer[10]);
 		unsigned long actualSpeed = 0;
-		status = LINXDev.SPISetSpeed( commandPacketBuffer[6], targetSpeed, &actualSpeed );
+		status = linxDev.SpiSetSpeed( commandPacketBuffer[6], targetSpeed, &actualSpeed );
 		//Build Response Packet
 		responsePacketBuffer[5] = (actualSpeed>>24) & 0xFF;		//Actual Speed MSB
 		responsePacketBuffer[6] = (actualSpeed>>16) & 0xFF;		//...
 		responsePacketBuffer[7] = (actualSpeed>>8) & 0xFF;			//...
 		responsePacketBuffer[8] = actualSpeed & 0xFF;					//Actual Speed LSB		
-		packetize(commandPacketBuffer, responsePacketBuffer, 4, L_OK); 
+		PacketizeAndSend(commandPacketBuffer, responsePacketBuffer, 4, L_OK); 
 		break;		
 	}	
 	case 0x0103: // SPI Set Mode
 	{
 		//Set SPI Mode
-		status = LINXDev.SPISetMode(commandPacketBuffer[6], commandPacketBuffer[7]);
+		status = linxDev.SpiSetMode(commandPacketBuffer[6], commandPacketBuffer[7]);
 		
 		//Build Response Packet
-		packetize(commandPacketBuffer, responsePacketBuffer, 4, status); 
+		PacketizeAndSend(commandPacketBuffer, responsePacketBuffer, 4, status); 
 		break;	
 	}
 	case 0x0107: // SPI Write Read
 	{
-		status = LINXDev.SPIWriteRead(commandPacketBuffer[6], commandPacketBuffer[7], (commandPacketBuffer[1]-11)/commandPacketBuffer[7], commandPacketBuffer[8], commandPacketBuffer[9], &commandPacketBuffer[10], &responsePacketBuffer[5]);
-		packetize(commandPacketBuffer, responsePacketBuffer, commandPacketBuffer[7]*commandPacketBuffer[8], status); 
+		status = linxDev.SpiWriteRead(commandPacketBuffer[6], commandPacketBuffer[7], (commandPacketBuffer[1]-11)/commandPacketBuffer[7], commandPacketBuffer[8], commandPacketBuffer[9], &commandPacketBuffer[10], &responsePacketBuffer[5]);
+		PacketizeAndSend(commandPacketBuffer, responsePacketBuffer, commandPacketBuffer[7]*commandPacketBuffer[8], status); 
 		break;
 	}
 	
 	default: //Default Case
-		statusResponse(commandPacketBuffer, responsePacketBuffer, (int)L_FUNCTION_NOT_SUPPORTED);
+		StatusResponse(commandPacketBuffer, responsePacketBuffer, (int)L_FUNCTION_NOT_SUPPORTED);
 		break;		
 	}
 	
@@ -278,7 +278,7 @@ int processCommand(unsigned char* commandPacketBuffer, unsigned char* responsePa
 }
 
 
-void packetize(unsigned char* commandPacketBuffer, unsigned char* responsePacketBuffer, unsigned int dataSize,  int status)
+void PacketizeAndSend(unsigned char* commandPacketBuffer, unsigned char* responsePacketBuffer, unsigned int dataSize,  int status)
 {
 	//Load Header
 	responsePacketBuffer[0] = 0xFF;                                 //SoF
@@ -296,11 +296,24 @@ void packetize(unsigned char* commandPacketBuffer, unsigned char* responsePacket
 	}
 	
 	//Compute And Load Checksum
-	responsePacketBuffer[dataSize+5] = computeChecksum(responsePacketBuffer);	
+	responsePacketBuffer[dataSize+5] = ComputeChecksum(responsePacketBuffer);	
 }
 
+void DataBufferResponse(unsigned char* commandPacketBuffer, unsigned char* responsePacketBuffer, const unsigned char* dataBuffer, unsigned char dataSize, int status)
+{
+	
+	//Copy Data Into Response Buffer
+	for(int i=0; i<dataSize; i++)
+	{
+		responsePacketBuffer[i+5] = dataBuffer[i];
+	}
+	
+	PacketizeAndSend(commandPacketBuffer, responsePacketBuffer, dataSize, status);
+}
+
+//DEBUG
 #ifdef DEBUG_ENABLED
-	void DEBUGCMDPACKET(unsigned char* packetBuffer)
+	void DebugPrintCmdPacket(unsigned char* packetBuffer)
 	{
 		fprintf(stdout, "Received : ");		
 		for(int i =0; i<packetBuffer[1]; i++)
@@ -312,7 +325,7 @@ void packetize(unsigned char* commandPacketBuffer, unsigned char* responsePacket
 #endif //DEBUG_ENABLED
 
 #ifdef DEBUG_ENABLED
-void debug_printResPacket(unsigned char* packetBuffer)
+void DebugPrintResPacket(unsigned char* packetBuffer)
 {
 	fprintf(stdout, "Replying With : ");
 	for(int i=0; i<packetBuffer[1]; i++)
@@ -322,15 +335,3 @@ void debug_printResPacket(unsigned char* packetBuffer)
 	fprintf(stdout, "\n");
 }
 #endif //DEBUG_ENABLED
-
-void dataBufferResponse(unsigned char* commandPacketBuffer, unsigned char* responsePacketBuffer, const unsigned char* dataBuffer, unsigned char dataSize, int status)
-{
-	
-	//Copy Data Into Response Buffer
-	for(int i=0; i<dataSize; i++)
-	{
-		responsePacketBuffer[i+5] = dataBuffer[i];
-	}
-	
-	packetize(commandPacketBuffer, responsePacketBuffer, dataSize, status);
-}

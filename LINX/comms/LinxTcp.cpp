@@ -99,7 +99,7 @@ int TCPServer::acceptConnection()
 		else
 		{
 			
-			TCPUpdateTime = getSeconds();
+			TCPUpdateTime = GetSeconds();
 			state = CONNECTED;
 			DEBUG(inet_ntoa(echoclient.sin_addr));
 			DEBUG("Successfully Connected\n");
@@ -108,7 +108,7 @@ int TCPServer::acceptConnection()
 	return 0;	
 }
 
-int TCPServer::processPackets(LINXDevice &LINXDev)
+int TCPServer::processPackets(LinxDevice &linxDev)
 {	
 	int received = -1;
 	unsigned char packetSize = 0;
@@ -153,10 +153,10 @@ int TCPServer::processPackets(LINXDevice &LINXDev)
 				{
 				
 					//Check Checksum
-					if(checksumPassed(recBuffer))
+					if(ChecksumPassed(recBuffer))
 					{					
 						//Process Packet Handle Any Networking Packets
-						int status = processCommand(recBuffer, sendBuffer, LINXDev);
+						int status = ProcessCommand(recBuffer, sendBuffer, linxDev);
 						if(status == L_DISCONNECT)
 						{
 							//Host Disconnected.  Listen For New Connection														

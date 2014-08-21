@@ -65,9 +65,9 @@ class LinxDevice
 		const unsigned char* DeviceName;
 		
 		//LINX API Version
-		unsigned char LinxAPIMajor;
-		unsigned char LinxAPIMinor;
-		unsigned char LinxAPISubminor;
+		unsigned char LinxApiMajor;
+		unsigned char LinxApiMinor;
+		unsigned char LinxApiSubminor;
 		
 		//----Peripherals----
 		

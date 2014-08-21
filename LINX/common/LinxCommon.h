@@ -11,8 +11,8 @@
 ****************************************************************************************/
 #ifdef DEBUG_ENABLED
 	#define DEBUG(x) fprintf(stdout, x);fprintf(stdout, "\n")
-	#define DEBUGCMDPACKET(x) debug_printCmdPacket(x)
-	#define DEBUGRESPACKET(x) debug_printResPacket(x)
+	#define DEBUGCMDPACKET(x) DebugPrintCmdPacket(x)
+	#define DEBUGRESPACKET(x) DebugPrintResPacket(x)
 #else
 	#define DEBUG(x) do {} while (0)									//Compile Out
 	#define DEBUGCMDPACKET(x) do {} while (0)					//Compile Out
@@ -22,26 +22,25 @@
 /****************************************************************************************
 ** Typedefs
 ****************************************************************************************/
-enum LINXStatus {L_OK, L_FUNCTION_NOT_SUPPORTED, L_REQUEST_RESEND, L_UNKNOWN_ERROR, L_DISCONNECT};
+enum LinxStatus {L_OK, L_FUNCTION_NOT_SUPPORTED, L_REQUEST_RESEND, L_UNKNOWN_ERROR, L_DISCONNECT};
 
 /****************************************************************************************
 ** Functions
 ****************************************************************************************/
 //LINX Helpers
-int processCommand(unsigned char* recBuffer, unsigned char* sendBuffer, LinxDevice& LinxDev);
-void packetize(unsigned char* commandPacketBuffer, unsigned char* responsePacketBuffer, unsigned int dataSize, int status);
-void statusResponse(unsigned char* commandPacketBuffer, unsigned char* responsePacketBuffer, int status);
-void dataBufferResponse(unsigned char* commandPacketBuffer, unsigned char* responsePacketBuffer, const unsigned char* dataBuffer, unsigned char dataSize, int status);
-unsigned char computeChecksum(unsigned char* packetBuffer);
-bool checksumPassed(unsigned char* packetBuffer);
+int ProcessCommand(unsigned char* recBuffer, unsigned char* sendBuffer, LinxDevice& LinxDev);
+void PacketizeAndSend(unsigned char* commandPacketBuffer, unsigned char* responsePacketBuffer, unsigned int dataSize, int status);
+void StatusResponse(unsigned char* commandPacketBuffer, unsigned char* responsePacketBuffer, int status);
+void DataBufferResponse(unsigned char* commandPacketBuffer, unsigned char* responsePacketBuffer, const unsigned char* dataBuffer, unsigned char dataSize, int status);
+unsigned char ComputeChecksum(unsigned char* packetBuffer);
+bool ChecksumPassed(unsigned char* packetBuffer);
 
 //Debugging
-void debug_Print(char* message);
-void debug_Println(char* message);
-void debug_printCmdPacket(unsigned char* packetBuffer);
-void debug_printResPacket(unsigned char* packetBuffer);
+void DebugPrint(char* message);
+void DebugPrintCmdPacket(unsigned char* packetBuffer);
+void DebugPrintResPacket(unsigned char* packetBuffer);
 
 //Misc
-unsigned long getSeconds();
+unsigned long GetSeconds();
 
 #endif //LINX_COMMON_H
