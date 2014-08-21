@@ -33,6 +33,9 @@ void DebugPrintCmdPacket(unsigned char* packetBuffer);
 void DebugPrintResPacket(unsigned char* packetBuffer);
 
 //Misc
+unsigned long GetNanoSeconds();
+unsigned long GetMicroSeconds();
+unsigned long GetMilliSeconds();
 unsigned long GetSeconds();
 
 #endif //LINX_COMMON_H

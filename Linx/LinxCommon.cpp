@@ -5,6 +5,23 @@
 #include "LinxCommon.h"
 #include "device/LinxDevice.h"
 
+unsigned long GetNanoSeconds()
+{
+	timespec mTime;
+	clock_gettime(CLOCK_MONOTONIC, &mTime);	
+	return mTime.tv_nsec;
+}
+
+unsigned long GetMicroSeconds()
+{
+	return GetNanoSeconds / 1000;
+}
+
+unsigned long GetMilliSeconds()
+{
+	return GetNanoSeconds / 1000000;
+}
+
 unsigned long GetSeconds()
 {
 	timespec mTime;
