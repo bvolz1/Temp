@@ -1,3 +1,6 @@
+/****************************************************************************************
+**  Includes
+****************************************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -7,16 +10,16 @@
 #include <unistd.h>
 #include <netinet/in.h>
 
-#include "../common/LinxCommon.h"
-#include "LinxTcp.h"
-#include "../device/LinxDevice.h"
+#include "../../common/LinxCommon.h"
+#include "../../device/LinxDevice.h"
+#include "LinxTcpListenerLinux.h"
 
 /****************************************************************************************
 **  Constructors
 ****************************************************************************************/
-TCPServer::TCPServer()
+LinxTcpListenerLinux::LinxTcpListenerLinux()
 {
-	state = START;
+	State = START;
 	timeout.tv_sec = 10;		//Set Socket Time-out To Default Value
 	TCPBufIndex = 0;
 }
@@ -25,7 +28,7 @@ TCPServer::TCPServer()
 **  Functions
 ****************************************************************************************/
 
-int TCPServer::begin(unsigned int serverPort)
+int LinxTcpListenerLinux::begin(unsigned int serverPort)
 {
 	DEBUG("Starting LINX TCP Server!");
 	
@@ -33,7 +36,7 @@ int TCPServer::begin(unsigned int serverPort)
 	if((serversock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0) 
 	{
 		DEBUG("Failed To Create Socket");
-		state = EXIT;
+		State = EXIT;
 		return -1;
 	}
 	else
@@ -53,7 +56,7 @@ int TCPServer::begin(unsigned int serverPort)
 	if( bind(serversock, (struct sockaddr *) &echoserver, sizeof(echoserver)) < 0)
 	{
 		DEBUG("Failed To Bind Sever Socket");
-		state = EXIT;
+		State = EXIT;
 		return -1;
 	}
 	else
@@ -65,19 +68,19 @@ int TCPServer::begin(unsigned int serverPort)
 	if(listen(serversock, MAX_PENDING_CONS) < 0)
 	{
 		DEBUG("Failed To Start Listening On Sever Socket");
-		state = EXIT;
+		State = EXIT;
 		return -1;
 	}
 	else
 	{
 		DEBUG("Successfully Started Listening On Sever Socket");
-		state = LISTENING;
+		State = LISTENING;
 	}
 	
 	return 0;
 }
 
-int TCPServer::acceptConnection()
+int LinxTcpListenerLinux::acceptConnection()
 {
 	DEBUG("Waiting For Client Connection\n");
 	
@@ -86,7 +89,7 @@ int TCPServer::acceptConnection()
 	if( (clientsock = accept(serversock, (struct sockaddr *) &echoclient, &clientlen)) < 0)
 	{
 		("Failed To Accept Client Connection\n");
-		state = EXIT;
+		State = EXIT;
 		return -1;
 	}
 	else
@@ -100,7 +103,7 @@ int TCPServer::acceptConnection()
 		{
 			
 			TCPUpdateTime = GetSeconds();
-			state = CONNECTED;
+			State = CONNECTED;
 			DEBUG(inet_ntoa(echoclient.sin_addr));
 			DEBUG("Successfully Connected\n");
 		}		
@@ -108,7 +111,7 @@ int TCPServer::acceptConnection()
 	return 0;	
 }
 
-int TCPServer::processPackets(LinxDevice &linxDev)
+int LinxTcpListenerLinux::processPackets(LinxDevice &linxDev)
 {	
 	int received = -1;
 	unsigned char packetSize = 0;
@@ -134,7 +137,7 @@ int TCPServer::processPackets(LinxDevice &linxDev)
 				if(packetSize > PACKET_BUFFER_SIZE)
 				{
 					DEBUG("Packet Size Too Large For Buffer");
-					state = EXIT;
+					State = EXIT;
 					return -1;
 				}				
 				return 0;
@@ -146,7 +149,7 @@ int TCPServer::processPackets(LinxDevice &linxDev)
 				{
 					//Failed To Read Packet From Buffer
 					DEBUG("Failed To Read Packet From Buffer");
-					state = EXIT;
+					State = EXIT;
 					return -1;				
 				}
 				else
@@ -161,7 +164,7 @@ int TCPServer::processPackets(LinxDevice &linxDev)
 						{
 							//Host Disconnected.  Listen For New Connection														
 							DEBUG("Disconnect");
-							state = LISTENING;							
+							State = LISTENING;							
 						}	
 										
 						
@@ -170,7 +173,7 @@ int TCPServer::processPackets(LinxDevice &linxDev)
 						if( send(clientsock, sendBuffer, bytesToSend, 0) != bytesToSend)
 						{
 							DEBUG("Failed To Send Response Packet");
-							state = EXIT;
+							State = EXIT;
 							return -1;
 						}
 						return 0;
@@ -194,7 +197,7 @@ int TCPServer::processPackets(LinxDevice &linxDev)
 	}
 }
 
-int TCPServer::stop()
+int LinxTcpListenerLinux::stop()
 {
 	close(serversock);
 	close(clientsock);
@@ -202,7 +205,7 @@ int TCPServer::stop()
 	return 0;
 }
 
-int TCPServer::peek(unsigned char * recBuffer, int bufferSize)
+int LinxTcpListenerLinux::peek(unsigned char * recBuffer, int bufferSize)
 {
 	int peekReceived = -1;
 	errno = 0;
@@ -217,7 +220,7 @@ int TCPServer::peek(unsigned char * recBuffer, int bufferSize)
 		}			
 		else
 		{
-			state = EXIT;
+			State = EXIT;
 			return peekReceived;
 		}
 	}
@@ -225,7 +228,7 @@ int TCPServer::peek(unsigned char * recBuffer, int bufferSize)
 	{		
 		//Client Disconnected
 		DEBUG("Client Disconnected");			
-		state = LISTENING;		
+		State = LISTENING;		
 	}
 	else
 	{

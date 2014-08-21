@@ -1,8 +1,8 @@
- /****************************************************************************************
+/****************************************************************************************
 **  Defines
 ****************************************************************************************/
 
- /****************************************************************************************
+/****************************************************************************************
 **  Includes
 ****************************************************************************************/
 #include <stdio.h>
@@ -14,15 +14,16 @@
 #include <netinet/in.h>
 
 #include "common/LinxCommon.h"
-#include "comms/LinxTcp.h"
 #include "device/LinxDevice.h"
 #include "device/raspberrypi/LinxRaspberryPi-B.h"
+
+#include "listener/LinxTcpListener.h"
+#include "listener/linux/LinxTcpListenerLinux.h"
 
 /****************************************************************************************
 ** Variables
 ****************************************************************************************/
-TCPServer LinxServer;
-
+LinxTcpListenerLinux LinxServer;
 LinxRaspberryPiB LinxDev;	
 
 int main(int argc, char *argv[])
@@ -35,7 +36,7 @@ int main(int argc, char *argv[])
 	{	
 	
 		//TCP Server State Machine
-		switch(LinxServer.state)
+		switch(LinxServer.State)
 		{
 			case START:
 				DEBUG("Start State");
@@ -52,10 +53,10 @@ int main(int argc, char *argv[])
 				LinxServer.processPackets(LinxDev);
 				break;
 
-			case RESTART:
+			case CLOSE:
 				DEBUG("Restarting LINX Server");
 				LinxServer.stop();
-				LinxServer.state = START;
+				LinxServer.State = START;
 				break;					
 				
 			case EXIT:

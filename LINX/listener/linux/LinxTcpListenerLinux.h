@@ -1,8 +1,9 @@
-#ifndef LINX_NETWORKING_H
+#ifndef LINX_TCP_LISTENER_LINUX_H
+#define LINX_TCP_LISTENER_LINUX_H
 
-#define LINX_NETWORKING_H
-#include "../device/LinxDevice.h"
-
+/****************************************************************************************
+**  Functions
+****************************************************************************************/
 #ifndef PACKET_BUFFER_SIZE
 	#define PACKET_BUFFER_SIZE 64
 #endif
@@ -11,17 +12,18 @@
 	#define MAX_PENDING_CONS 2
 #endif
 
-//Variables
-enum TCPServerState {START, LISTENING, CONNECTED, RESTART, EXIT};
+/****************************************************************************************
+**  Includes
+****************************************************************************************/
+#include "../LinxTcpListener.h"
+#include "../../device/LinxDevice.h"
 
-class TCPServer
+class LinxTcpListenerLinux : public LinxTcpListener
 {
 	public:	
 		/****************************************************************************************
 		**  Variables
 		****************************************************************************************/		
-		TCPServerState state;
-		
 		unsigned char recBuffer[PACKET_BUFFER_SIZE];
 		unsigned char sendBuffer[PACKET_BUFFER_SIZE];
 		
@@ -37,7 +39,7 @@ class TCPServer
 		/****************************************************************************************
 		**  Constructors
 		****************************************************************************************/
-		TCPServer();		//Default Constructor
+		LinxTcpListenerLinux();		//Default Constructor
 	
 	
 		/****************************************************************************************
@@ -52,8 +54,7 @@ class TCPServer
 		/****************************************************************************************
 		**  Variables
 		****************************************************************************************/		
-		int TCPBufIndex;
-		
+		int TCPBufIndex;		
 		
 		/****************************************************************************************
 		**  Functions
@@ -62,4 +63,4 @@ class TCPServer
 		
 };
 
-#endif //LINX_NETWORKING_H
+#endif //LINX_TCP_LISTENER_LINUX_H
