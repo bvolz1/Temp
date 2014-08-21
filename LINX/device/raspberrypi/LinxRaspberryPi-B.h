@@ -5,8 +5,8 @@
 /****************************************************************************************
 **  Defines
 ****************************************************************************************/	
-#define DEVICE_NAME_LEN 20
-#define NUM_DIO_CHANS 17
+#define DEVICE_NAME_LEN 21
+#define NUM_DIGITAL_CHANS 17
 
 #define NUM_SPI_CHANS 1
 #define NUM_SPI_SPEEDS 13
@@ -21,30 +21,30 @@
 ****************************************************************************************/		
 #include "LinxRaspberryPi.h"
 	
-class LINXRaspberryPi_B : public LINXRaspberryPi
+class LinxRaspberryPiB : public LinxRaspberryPi
 {
 	public:	
 		/****************************************************************************************
 		**  Variables
 		****************************************************************************************/		
 		//System
-		static const unsigned char m_deviceName[DEVICE_NAME_LEN];
+		static const unsigned char m_DeviceName[DEVICE_NAME_LEN];
 		
-		//DIO
-		static const unsigned char m_DIOChans[NUM_DIO_CHANS];
+		//DIGITAL
+		static const unsigned char m_DigitalChans[NUM_DIGITAL_CHANS];
 		
 		//SPI
-		static const unsigned char m_SPIChans[NUM_SPI_CHANS];
-		static int m_SPIHandles[NUM_SPI_CHANS];
-		static const char m_SPIPaths[NUM_SPI_CHANS][SPI_PATH_LEN];
-		static unsigned long m_SPISupportedSpeeds[NUM_SPI_SPEEDS];
-		static unsigned long m_SPISetSpeeds[NUM_SPI_CHANS];
-		static unsigned char m_SPIBitOrders[NUM_SPI_CHANS];
+		static const unsigned char m_SpiChans[NUM_SPI_CHANS];
+		static int m_SpiHandles[NUM_SPI_CHANS];
+		static const char m_SpiPaths[NUM_SPI_CHANS][SPI_PATH_LEN];
+		static unsigned long m_SpiSupportedSpeeds[NUM_SPI_SPEEDS];
+		static unsigned long m_SpiSetSpeeds[NUM_SPI_CHANS];
+		static unsigned char m_SpiBitOrders[NUM_SPI_CHANS];
 		
 		//I2C
-		static unsigned char m_I2CChans[NUM_I2C_CHANS];
-		static int m_I2CHandles[NUM_I2C_CHANS];
-		static const char m_I2CPaths[NUM_I2C_CHANS][I2C_PATH_LEN];
+		static unsigned char m_I2cChans[NUM_I2C_CHANS];
+		static int m_I2cHandles[NUM_I2C_CHANS];
+		static const char m_I2cPaths[NUM_I2C_CHANS][I2C_PATH_LEN];
 		
 		//UART
 		static unsigned char m_UartChans[NUM_UART_CHANS];
@@ -56,9 +56,9 @@ class LINXRaspberryPi_B : public LINXRaspberryPi
 		/****************************************************************************************
 		**  Constructors /  Destructor
 		****************************************************************************************/
-		LINXRaspberryPi_B();
+		LinxRaspberryPiB();
 		
-		~LINXRaspberryPi_B();
+		~LinxRaspberryPiB();
 			
 		/****************************************************************************************
 		**  Functions

@@ -8,10 +8,10 @@
 /****************************************************************************************
 **  Constructors
 ****************************************************************************************/
-LINXDevice::LINXDevice()
+LinxDevice::LinxDevice()
 {
-	deviceFamily = 0xFE;
-	deviceID = 0x00;
+	DeviceFamily = 0xFE;
+	DeviceID = 0x00;
 }
 
 /****************************************************************************************
@@ -19,7 +19,7 @@ LINXDevice::LINXDevice()
 ****************************************************************************************/
 
 //Reverse The Order Of Bits In A Byte.  This Is Useful For SPI Hardware That Does Not Support Bit Order
-unsigned char LINXDevice::reverseBits(unsigned char b) 
+unsigned char LinxDevice::ReverseBits(unsigned char b) 
 {
 	b = (b & 0xF0) >> 4 | (b & 0x0F) << 4;
 	b = (b & 0xCC) >> 2 | (b & 0x33) << 2;

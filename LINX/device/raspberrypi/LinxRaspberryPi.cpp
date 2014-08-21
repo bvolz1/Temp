@@ -28,22 +28,22 @@
 /****************************************************************************************
 **  Constructors / Destructors 
 ****************************************************************************************/
-LINXRaspberryPi::LINXRaspberryPi( )
+LinxRaspberryPi::LinxRaspberryPi( )
 {
 	//-----All-----
-	deviceFamily = 0x04;
+	DeviceFamily = 0x04;
 	
 	//LINX API Version
-	linxAPIMajor = 1;
-	linxAPIMinor = 1;
-	linxAPISubminor = 0;	
+	LinxAPIMajor = 1;
+	LinxAPIMinor = 1;
+	LinxAPISubminor = 0;	
 }
 
 
 /****************************************************************************************
 **  Functions
 ****************************************************************************************/
-int LINXRaspberryPi::GPIOExport (const unsigned char*  GPIOChans, const unsigned char numGPIOChans)
+int LinxRaspberryPi::GpioExport (const unsigned char*  gpioChans, const unsigned char numGpioChans)
 {
 	DEBUG("Exporting GPIO");
 	
@@ -51,12 +51,12 @@ int LINXRaspberryPi::GPIOExport (const unsigned char*  GPIOChans, const unsigned
 	FILE * exportFile;	
 		
 	//Export GPIO Pins
-	for(int i=0; i<numGPIOChans; i++)
+	for(int i=0; i<numGpioChans; i++)
 	{
 		//Open Export File
 		exportFile = fopen("/sys/class/gpio/export", "w");
 		
-		fprintf(exportFile, "%u", GPIOChans[i]);		
+		fprintf(exportFile, "%u", gpioChans[i]);		
 		
 		//Close Export File
 		fclose(exportFile);		
@@ -65,7 +65,7 @@ int LINXRaspberryPi::GPIOExport (const unsigned char*  GPIOChans, const unsigned
 	return 0;
 }
 
-int LINXRaspberryPi::GPIOUnexport(const unsigned char*  GPIOChans, const unsigned char numGPIOChans)
+int LinxRaspberryPi::GpioUnexport(const unsigned char*  gpioChans, const unsigned char numGpioChans)
 {
 	DEBUG("Unexporting GPIO");
 	
@@ -73,12 +73,12 @@ int LINXRaspberryPi::GPIOUnexport(const unsigned char*  GPIOChans, const unsigne
 	FILE * unexportFile;
 
 	//Export GPIO Pins
-	for(int i=0; i<numGPIOChans; i++)
+	for(int i=0; i<numGpioChans; i++)
 	{
 		//Open Unexport File
 		unexportFile = fopen("/sys/class/gpio/unexport", "w");
 		
-		fprintf(unexportFile, "%u", GPIOChans[i]);			
+		fprintf(unexportFile, "%u", gpioChans[i]);			
 		
 		//Close Unexport File
 		fclose(unexportFile);
@@ -87,7 +87,7 @@ int LINXRaspberryPi::GPIOUnexport(const unsigned char*  GPIOChans, const unsigne
 	return 0;
 }
 
-int LINXRaspberryPi::GPIOSetDir(unsigned char pin, unsigned char mode)
+int LinxRaspberryPi::GpioSetDir(unsigned char pin, unsigned char mode)
 {
 	DEBUG("RPI GPIO Set Dir");
 	
@@ -125,7 +125,7 @@ int LINXRaspberryPi::GPIOSetDir(unsigned char pin, unsigned char mode)
 	
 }
 
-int LINXRaspberryPi::GPIOWrite(unsigned char pin, unsigned char val)
+int LinxRaspberryPi::GpioWrite(unsigned char pin, unsigned char val)
 {
 	DEBUG("RPI GPIO Write");
 	
@@ -146,14 +146,14 @@ int LINXRaspberryPi::GPIOWrite(unsigned char pin, unsigned char val)
 	return 0;
 }
 
-int LINXRaspberryPi::digitalWrite(unsigned char numPins, unsigned char* pins, unsigned char* values)
+int LinxRaspberryPi::DigitalWrite(unsigned char numPins, unsigned char* pins, unsigned char* values)
 {
 	DEBUG("Digital Write At Pi Level");		
 	
 	for(int i=0; i<numPins; i++)
 	{		
-		GPIOSetDir(pins[i], 1);
-		GPIOWrite( pins[i], (values[i/8] >> i%8) & 0x01);
+		GpioSetDir(pins[i], 1);
+		GpioWrite( pins[i], (values[i/8] >> i%8) & 0x01);
 	}
 	
 	return 0;
@@ -161,10 +161,10 @@ int LINXRaspberryPi::digitalWrite(unsigned char numPins, unsigned char* pins, un
 
 //----------SPI
 
-int LINXRaspberryPi::SPIOpenMaster(unsigned char channel)
+int LinxRaspberryPi::SpiOpenMaster(unsigned char channel)
 {
 	//Channel Checking Is Done On Farther Up The Stack, So Just Open It
-	int handle = open(SPIPaths[channel], O_RDWR);
+	int handle = open(SpiPaths[channel], O_RDWR);
 	if (handle < 0)
 	{
 		DEBUG("Failed To Open SPI Channel");
@@ -175,21 +175,21 @@ int LINXRaspberryPi::SPIOpenMaster(unsigned char channel)
 		//Default To Mode 0 With No CS (We'll Use GPIO When Performing Write)
 		unsigned long spi_Mode = SPI_NO_CS | SPI_MODE_0;
 		int retVal = ioctl(handle, SPI_IOC_WR_MODE, &spi_Mode);		
-		SPIHandles[channel] = handle;
+		SpiHandles[channel] = handle;
 		return L_OK;
 	}
 }
 
-int LINXRaspberryPi::SPISetBitOrder(unsigned char channel, unsigned char bitOrder)
+int LinxRaspberryPi::SpiSetBitOrder(unsigned char channel, unsigned char bitOrder)
 {
 	//Store Bit Order.  This Will Be Used During Write
-	*(SPIBitOrders+channel) = bitOrder;
+	*(SpiBitOrders+channel) = bitOrder;
 }
 
-int LINXRaspberryPi::SPISetMode(unsigned char channel, unsigned char mode)	
+int LinxRaspberryPi::SpiSetMode(unsigned char channel, unsigned char mode)	
 {
 	unsigned long spi_Mode = SPI_NO_CS | (unsigned long) mode;
-	int retVal = ioctl(SPIHandles[channel], SPI_IOC_WR_MODE, &spi_Mode);
+	int retVal = ioctl(SpiHandles[channel], SPI_IOC_WR_MODE, &spi_Mode);
 	if(retVal < 0)
 	{
 		DEBUG("Failed To Set SPI Mode");
@@ -201,44 +201,44 @@ int LINXRaspberryPi::SPISetMode(unsigned char channel, unsigned char mode)
 	}	
 }
 
-int LINXRaspberryPi::SPISetSpeed(unsigned char channel, unsigned long speed, unsigned long* actualSpeed)
+int LinxRaspberryPi::SpiSetSpeed(unsigned char channel, unsigned long speed, unsigned long* actualSpeed)
 {
 
 	int index = 0;
 	//Loop Over All Supported SPI Speeds
-	for(index=0; index < numSPISpeeds; index++)
+	for(index=0; index < NumSpiSpeeds; index++)
 	{
 			
-			if(speed < *(SPISupportedSpeeds+index))
+			if(speed < *(SpiSupportedSpeeds+index))
 			{
 				index = index - 1; //Use Fastest Speed Below Target Speed
 				break;
 			}
 			//If Target Speed Is Higher Than Max Speed Use Max Speed			
 	}
-	*(SPISetSpeeds+channel) = *(SPISupportedSpeeds+index);
-	*actualSpeed = *(SPISupportedSpeeds+index);
+	*(SpiSetSpeeds+channel) = *(SpiSupportedSpeeds+index);
+	*actualSpeed = *(SpiSupportedSpeeds+index);
 	return L_OK;
 }
 
-int LINXRaspberryPi::SPIWriteRead(unsigned char channel, unsigned char frameSize, unsigned char numFrames, unsigned char csChan, unsigned char csLL, unsigned char* sendBuffer, unsigned char* recBuffer)
+int LinxRaspberryPi::SpiWriteRead(unsigned char channel, unsigned char frameSize, unsigned char numFrames, unsigned char csChan, unsigned char csLL, unsigned char* sendBuffer, unsigned char* recBuffer)
 {
 	unsigned char nextByte = 0;	//First Byte Of Next SPI Frame	
 	
 	//SPI Hardware Only Supports MSb First Transfer.  If  Configured for LSb First Reverse Bits In Software
-	if( *(SPIBitOrders+channel) == LSBFIRST )
+	if( *(SpiBitOrders+channel) == LSBFIRST )
 	{
 		for(int i=0; i< frameSize*numFrames; i++)
 		{			
-			sendBuffer[i] = reverseBits(sendBuffer[i]);
+			sendBuffer[i] = ReverseBits(sendBuffer[i]);
 		}
 	}
 	
 	struct spi_ioc_transfer transfer;
 	
 	//Set CS As Output And Make Sure GPIO CS Starts Idle	
-	GPIOSetDir(csChan, OUTPUT);	
-	GPIOWrite(csChan, (~csLL & 0x01) );
+	GpioSetDir(csChan, OUTPUT);	
+	GpioWrite(csChan, (~csLL & 0x01) );
 	
 	for(int i=0; i< numFrames; i++)
 	{
@@ -247,18 +247,18 @@ int LINXRaspberryPi::SPIWriteRead(unsigned char channel, unsigned char frameSize
 		transfer.rx_buf = (unsigned long)(recBuffer+nextByte);
 		transfer.len = frameSize;
 		transfer.delay_usecs = 0;
-		transfer.speed_hz = *(SPISetSpeeds+channel) * 2;
+		transfer.speed_hz = *(SpiSetSpeeds+channel) * 2;
 		//transfer.speed_hz = 3000000;
 		transfer.bits_per_word = 8;
 	
 		//CS Active
-		GPIOWrite(csChan, csLL);
+		GpioWrite(csChan, csLL);
 		
 		//Transfer Data
-		int retVal = ioctl(SPIHandles[channel], SPI_IOC_MESSAGE(1), &transfer);
+		int retVal = ioctl(SpiHandles[channel], SPI_IOC_MESSAGE(1), &transfer);
 		
 		//CS Idle
-		GPIOWrite(csChan, (~csLL & 0x01) );
+		GpioWrite(csChan, (~csLL & 0x01) );
 		
 		if (retVal < 1)
 		{
@@ -271,9 +271,9 @@ int LINXRaspberryPi::SPIWriteRead(unsigned char channel, unsigned char frameSize
 }
 
 //----------I2C----------//
-int LINXRaspberryPi::I2COpenMaster(unsigned char channel)
+int LinxRaspberryPi::I2cOpenMaster(unsigned char channel)
 {
-	int handle = open(I2CPaths[channel], O_RDWR);
+	int handle = open(I2cPaths[channel], O_RDWR);
 	if (handle < 0)
 	{
 		DEBUG("Failed To Open I2C Channel");
@@ -281,17 +281,17 @@ int LINXRaspberryPi::I2COpenMaster(unsigned char channel)
 	}
 	else
 	{
-		I2CHandles[channel] = handle;
+		I2cHandles[channel] = handle;
 	}
 	return L_OK;
 }
 
-int LINXRaspberryPi::I2CSetSpeed(unsigned char channel, unsigned long speed, unsigned long* actualSpeed)
+int LinxRaspberryPi::I2cSetSpeed(unsigned char channel, unsigned long speed, unsigned long* actualSpeed)
 {
 	return  L_FUNCTION_NOT_SUPPORTED;
 }
 
-int LINXRaspberryPi::I2CWrite(unsigned char channel, unsigned char slaveAddress, unsigned char eofConfig, unsigned char numBytes, unsigned char* sendBuffer)
+int LinxRaspberryPi::I2cWrite(unsigned char channel, unsigned char slaveAddress, unsigned char eofConfig, unsigned char numBytes, unsigned char* sendBuffer)
 {
 	//Check EOF - Currently Only Support 0x00
 	if(eofConfig != EOF_STOP)
@@ -300,14 +300,14 @@ int LINXRaspberryPi::I2CWrite(unsigned char channel, unsigned char slaveAddress,
 	}
 	
 	//Set Slave Address
-	if (ioctl(I2CHandles[channel], I2C_SLAVE, slaveAddress) < 0) 
+	if (ioctl(I2cHandles[channel], I2C_SLAVE, slaveAddress) < 0) 
 	{
 		//Failed To Set Slave Address
 		return LI2C_SADDR;
 	}
 		
 	//Write Data
-	if(write(I2CHandles[channel], sendBuffer, numBytes) != numBytes)
+	if(write(I2cHandles[channel], sendBuffer, numBytes) != numBytes)
 	{
 		return LI2C_WRITE_FAIL;
 	}
@@ -315,7 +315,7 @@ int LINXRaspberryPi::I2CWrite(unsigned char channel, unsigned char slaveAddress,
 	return L_OK;
 }
 
-int LINXRaspberryPi::I2CRead(unsigned char channel, unsigned char slaveAddress, unsigned char eofConfig, unsigned char numBytes, unsigned int timeout, unsigned char* recBuffer)
+int LinxRaspberryPi::I2cRead(unsigned char channel, unsigned char slaveAddress, unsigned char eofConfig, unsigned char numBytes, unsigned int timeout, unsigned char* recBuffer)
 {
 	//Check EOF - Currently Only Support 0x00
 	if(eofConfig != EOF_STOP)
@@ -324,23 +324,23 @@ int LINXRaspberryPi::I2CRead(unsigned char channel, unsigned char slaveAddress, 
 	}
 	
 	//Set Slave Address
-	if (ioctl(I2CHandles[channel], I2C_SLAVE, slaveAddress) < 0) 
+	if (ioctl(I2cHandles[channel], I2C_SLAVE, slaveAddress) < 0) 
 	{
 		//Failed To Set Slave Address
 		return LI2C_SADDR;
 	}
 	
-	if(read(I2CHandles[channel], recBuffer, numBytes) < numBytes)
+	if(read(I2cHandles[channel], recBuffer, numBytes) < numBytes)
 	{
 		return LI2C_READ_FAIL;	
 	}
 	return L_OK;
 }
 
-int LINXRaspberryPi::I2CClose(unsigned char channel)
+int LinxRaspberryPi::I2cClose(unsigned char channel)
 {
 	//Close I2C Channel
-	if(close(I2CHandles[channel]) < 0)
+	if(close(I2cHandles[channel]) < 0)
 	{
 		return LI2C_CLOSE_FAIL;
 	}
@@ -349,7 +349,7 @@ int LINXRaspberryPi::I2CClose(unsigned char channel)
 }
 
 //UART
-int LINXRaspberryPi::UartOpen(unsigned char channel, unsigned long baudRate, unsigned long* actualBaud)
+int LinxRaspberryPi::UartOpen(unsigned char channel, unsigned long baudRate, unsigned long* actualBaud)
 {
 	//Open UART	
 	int handle = open(UartPaths[channel],  O_RDWR | O_NDELAY);
@@ -369,7 +369,7 @@ int LINXRaspberryPi::UartOpen(unsigned char channel, unsigned long baudRate, uns
 	return L_OK;
 }
 
-int LINXRaspberryPi::UartSetBaudRate(unsigned char channel, unsigned long baudRate , unsigned long* actualBaud)
+int LinxRaspberryPi::UartSetBaudRate(unsigned char channel, unsigned long baudRate , unsigned long* actualBaud)
 {
 	
 	//Get Closest Support Baud Rate Without Going Over
@@ -406,7 +406,7 @@ int LINXRaspberryPi::UartSetBaudRate(unsigned char channel, unsigned long baudRa
 	return  L_OK;
 }
 
-int LINXRaspberryPi::UartGetBytesAvailable(unsigned char channel, unsigned char *numBytes)
+int LinxRaspberryPi::UartGetBytesAvailable(unsigned char channel, unsigned char *numBytes)
 {
 	int bytesAtPort = -1;
 	ioctl(UartHandles[channel], FIONREAD, &bytesAtPort);
@@ -424,7 +424,7 @@ int LINXRaspberryPi::UartGetBytesAvailable(unsigned char channel, unsigned char 
 	return  L_OK;
 }
 
-int LINXRaspberryPi::UartRead(unsigned char channel, unsigned char numBytes, unsigned char* recBuffer, unsigned char* numBytesRead)
+int LinxRaspberryPi::UartRead(unsigned char channel, unsigned char numBytes, unsigned char* recBuffer, unsigned char* numBytesRead)
 {
 	//Check If Enough Bytes Are Available
 	unsigned char bytesAvailable = -1;
@@ -444,7 +444,7 @@ int LINXRaspberryPi::UartRead(unsigned char channel, unsigned char numBytes, uns
 	return  L_OK;
 }
 
-int LINXRaspberryPi::UartWrite(unsigned char channel, unsigned char numBytes, unsigned char* sendBuffer)
+int LinxRaspberryPi::UartWrite(unsigned char channel, unsigned char numBytes, unsigned char* sendBuffer)
 {
 	
 	//debug
@@ -465,7 +465,7 @@ int LINXRaspberryPi::UartWrite(unsigned char channel, unsigned char numBytes, un
 	return  L_OK;
 }
 
-int LINXRaspberryPi::UartClose(unsigned char channel)
+int LinxRaspberryPi::UartClose(unsigned char channel)
 {
 	//Close UART Channel, Return OK or Error
 	if (close(UartHandles[channel]) < 0)

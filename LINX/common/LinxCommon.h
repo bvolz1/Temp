@@ -28,7 +28,7 @@ enum LINXStatus {L_OK, L_FUNCTION_NOT_SUPPORTED, L_REQUEST_RESEND, L_UNKNOWN_ERR
 ** Functions
 ****************************************************************************************/
 //LINX Helpers
-int processCommand(unsigned char* recBuffer, unsigned char* sendBuffer, LINXDevice& LINXDev);
+int processCommand(unsigned char* recBuffer, unsigned char* sendBuffer, LinxDevice& LinxDev);
 void packetize(unsigned char* commandPacketBuffer, unsigned char* responsePacketBuffer, unsigned int dataSize, int status);
 void statusResponse(unsigned char* commandPacketBuffer, unsigned char* responsePacketBuffer, int status);
 void dataBufferResponse(unsigned char* commandPacketBuffer, unsigned char* responsePacketBuffer, const unsigned char* dataBuffer, unsigned char dataSize, int status);

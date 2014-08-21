@@ -16,23 +16,23 @@
 **  Variables
 ****************************************************************************************/		
 
-class LINXRaspberryPi : public LINXDevice
+class LinxRaspberryPi : public LinxDevice
 {
 	public:	
 		/****************************************************************************************
 		**  Variables
 		****************************************************************************************/		
 		//SPI
-		int* SPIHandles;											//SPI File Handles
-		const char (*SPIPaths)[SPI_PATH_LEN];			//SPI Channel File Paths
-		unsigned char numSPISpeeds;						//Number Of Supported SPI Speeds
-		unsigned long* SPISupportedSpeeds;				//Supported SPI Clock Frequencies
-		unsigned long* SPISetSpeeds;						//Set SPI Clock Frequencies
-		unsigned char* SPIBitOrders;							//SPI Bit Orders
+		int* SpiHandles;											//SPI File Handles
+		const char (*SpiPaths)[SPI_PATH_LEN];			//SPI Channel File Paths
+		unsigned char NumSpiSpeeds;						//Number Of Supported SPI Speeds
+		unsigned long* SpiSupportedSpeeds;				//Supported SPI Clock Frequencies
+		unsigned long* SpiSetSpeeds;						//Set SPI Clock Frequencies
+		unsigned char* SpiBitOrders;							//SPI Bit Orders
 			
 		//I2C
-		int* I2CHandles;											//I2C File Handles
-		const char (*I2CPaths)[I2C_PATH_LEN];			//I2C Channel File Paths
+		int* I2cHandles;											//I2C File Handles
+		const char (*I2cPaths)[I2C_PATH_LEN];			//I2C Channel File Paths
 		
 		//UART
 		int* UartHandles;											//UART File Handles
@@ -44,34 +44,34 @@ class LINXRaspberryPi : public LINXDevice
 		/****************************************************************************************
 		**  Constructors
 		****************************************************************************************/
-		LINXRaspberryPi();
+		LinxRaspberryPi();
 			
 		/****************************************************************************************
 		**  Functions
 		****************************************************************************************/
 		//Member Functions
-		int GPIOExport(const unsigned char*  GPIOChans, const unsigned char numGPIOChans);
-		int GPIOUnexport(const unsigned char*  GPIOChans, const unsigned char numGPIOChans);
-		int GPIOSetDir(unsigned char pin, unsigned char mode);
+		int GpioExport(const unsigned char*  GPIOChans, const unsigned char numGPIOChans);
+		int GpioUnexport(const unsigned char*  GPIOChans, const unsigned char numGPIOChans);
+		int GpioSetDir(unsigned char pin, unsigned char mode);
 		//Read
-		int GPIOWrite(unsigned char pin, unsigned char val);
+		int GpioWrite(unsigned char pin, unsigned char val);
 				
 		//  Base Class Override Functions
-		int digitalWrite(unsigned char numPins, unsigned char* pins, unsigned char* values);
+		int DigitalWrite(unsigned char numPins, unsigned char* pins, unsigned char* values);
 		
 		//SPI
-		int SPIOpenMaster(unsigned char channel);
-		int SPISetMode(unsigned char channel, unsigned char mode);
-		int SPISetBitOrder(unsigned char channel, unsigned char mode);
-		int SPISetSpeed(unsigned char channel, unsigned long speed, unsigned long* actualSpeed);
-		int SPIWriteRead(unsigned char channel, unsigned char frameSize, unsigned char numFrames, unsigned char csChan, unsigned char csLL, unsigned char* sendBuffer, unsigned char* recBuffer);
+		int SpiOpenMaster(unsigned char channel);
+		int SpiSetMode(unsigned char channel, unsigned char mode);
+		int SpiSetBitOrder(unsigned char channel, unsigned char mode);
+		int SpiSetSpeed(unsigned char channel, unsigned long speed, unsigned long* actualSpeed);
+		int SpiWriteRead(unsigned char channel, unsigned char frameSize, unsigned char numFrames, unsigned char csChan, unsigned char csLL, unsigned char* sendBuffer, unsigned char* recBuffer);
 		
 		//I2C
-		int I2COpenMaster(unsigned char channel);
-		int I2CSetSpeed(unsigned char channel, unsigned long speed, unsigned long* actualSpeed);
-		int I2CWrite(unsigned char channel, unsigned char slaveAddress, unsigned char eofConfig, unsigned char numBytes, unsigned char* sendBuffer);
-		int I2CRead(unsigned char channel, unsigned char slaveAddress, unsigned char eofConfig, unsigned char numBytes, unsigned int timeout, unsigned char* recBuffer);
-		int I2CClose(unsigned char channel);
+		int I2cOpenMaster(unsigned char channel);
+		int I2cSetSpeed(unsigned char channel, unsigned long speed, unsigned long* actualSpeed);
+		int I2cWrite(unsigned char channel, unsigned char slaveAddress, unsigned char eofConfig, unsigned char numBytes, unsigned char* sendBuffer);
+		int I2cRead(unsigned char channel, unsigned char slaveAddress, unsigned char eofConfig, unsigned char numBytes, unsigned int timeout, unsigned char* recBuffer);
+		int I2cClose(unsigned char channel);
 		
 		//UART
 		int UartOpen(unsigned char channel, unsigned long baudRate, unsigned long* actualBaud);

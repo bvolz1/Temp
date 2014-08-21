@@ -51,7 +51,7 @@ typedef enum UartStatus
 	LUART_CLOSE_FAIL
 }UartStatus;
 
-class LINXDevice
+class LinxDevice
 {
 	public:	
 		/****************************************************************************************
@@ -59,80 +59,80 @@ class LINXDevice
 		****************************************************************************************/				
 		
 		//Device ID
-		unsigned char deviceFamily;
-		unsigned char deviceID;
-		unsigned char deviceNameLen;
-		const unsigned char* deviceName;
+		unsigned char DeviceFamily;
+		unsigned char DeviceID;
+		unsigned char DeviceNameLen;
+		const unsigned char* DeviceName;
 		
 		//LINX API Version
-		unsigned char linxAPIMajor;
-		unsigned char linxAPIMinor;
-		unsigned char linxAPISubminor;
+		unsigned char LinxAPIMajor;
+		unsigned char LinxAPIMinor;
+		unsigned char LinxAPISubminor;
 		
 		//----Peripherals----
 		
 		//DIO		
-		unsigned char numDIOChans;
-		const unsigned char*  DIOChans;
+		unsigned char NumDigitalChans;
+		const unsigned char*  DigitalChans;
 		
 		//AI
-		unsigned char numAIChans;
-		const unsigned char* AIChans;
-		unsigned char AIResolution;
-		unsigned long AIRef;
+		unsigned char NumAiChans;
+		const unsigned char* AiChans;
+		unsigned char AiResolution;
+		unsigned long AiRef;
 		
 		//AO
-		unsigned char numAOChans;
-		const unsigned char* AOChans;
+		unsigned char NumAoChans;
+		const unsigned char* AoChans;
 		
 		//PWM
-		unsigned char numPWMChans;
-		const unsigned char* PWMChans;
+		unsigned char NumPwmChans;
+		const unsigned char* PwmChans;
 		
 		//QE
-		unsigned char numQEChans;
-		const unsigned char* QEChans;
+		unsigned char NumQeChans;
+		const unsigned char* QeChans;
 		
 		//UART
 		unsigned char NumUartChans;
 		const unsigned char* UartChans;
 		
 		//I2C
-		unsigned char numI2CChans;
-		const unsigned char* I2CChans;
+		unsigned char NumI2cChans;
+		const unsigned char* I2cChans;
 		
 		//SPI
-		unsigned char numSPIChans;
-		const unsigned char* SPIChans;
+		unsigned char NumSpiChans;
+		const unsigned char* SpiChans;
 		
 		//CAN
-		unsigned char numCANChans;
-		const unsigned char* CANChans;
+		unsigned char NumCanChans;
+		const unsigned char* CanChans;
 		
 		/****************************************************************************************
 		**  Constructors
 		****************************************************************************************/
-		LINXDevice();
+		LinxDevice();
 			
 		/****************************************************************************************
 		**  Functions
 		****************************************************************************************/
-		//DIO
-		virtual int digitalWrite(unsigned char numPins, unsigned char* pins, unsigned char* values) = 0;
+		//DIGITAL
+		virtual int DigitalWrite(unsigned char numPins, unsigned char* pins, unsigned char* values) = 0;
 		
 		//SPI
-		virtual int SPIOpenMaster(unsigned char channel) = 0;
-		virtual int SPISetBitOrder(unsigned char channel, unsigned char bitOrder) = 0;
-		virtual int SPISetMode(unsigned char channel, unsigned char mode) = 0;
-		virtual int SPISetSpeed(unsigned char channel, unsigned long speed, unsigned long* actualSpeed) = 0;
-		virtual int SPIWriteRead(unsigned char channel, unsigned char frameSize, unsigned char numFrames, unsigned char csChan, unsigned char csLL, unsigned char* sendBuffer, unsigned char* recBuffer) = 0;
+		virtual int SpiOpenMaster(unsigned char channel) = 0;
+		virtual int SpiSetBitOrder(unsigned char channel, unsigned char bitOrder) = 0;
+		virtual int SpiSetMode(unsigned char channel, unsigned char mode) = 0;
+		virtual int SpiSetSpeed(unsigned char channel, unsigned long speed, unsigned long* actualSpeed) = 0;
+		virtual int SpiWriteRead(unsigned char channel, unsigned char frameSize, unsigned char numFrames, unsigned char csChan, unsigned char csLL, unsigned char* sendBuffer, unsigned char* recBuffer) = 0;
 		
 		//I2C
-		virtual int I2COpenMaster(unsigned char channel) = 0;
-		virtual int I2CSetSpeed(unsigned char channel, unsigned long speed, unsigned long* actualSpeed) = 0;
-		virtual int I2CWrite(unsigned char channel, unsigned char slaveAddress, unsigned char eofConfig, unsigned char numBytes, unsigned char* sendBuffer) = 0;
-		virtual int I2CRead(unsigned char channel, unsigned char slaveAddress, unsigned char eofConfig, unsigned char numBytes, unsigned int timeout, unsigned char* recBuffer) = 0;		
-		virtual int I2CClose(unsigned char channel) = 0;
+		virtual int I2cOpenMaster(unsigned char channel) = 0;
+		virtual int I2cSetSpeed(unsigned char channel, unsigned long speed, unsigned long* actualSpeed) = 0;
+		virtual int I2cWrite(unsigned char channel, unsigned char slaveAddress, unsigned char eofConfig, unsigned char numBytes, unsigned char* sendBuffer) = 0;
+		virtual int I2cRead(unsigned char channel, unsigned char slaveAddress, unsigned char eofConfig, unsigned char numBytes, unsigned int timeout, unsigned char* recBuffer) = 0;		
+		virtual int I2cClose(unsigned char channel) = 0;
 		
 		//UART
 		virtual int UartOpen(unsigned char channel, unsigned long baudRate, unsigned long* actualBaud) = 0;
@@ -144,7 +144,7 @@ class LINXDevice
 		
 		
 		//General - 
-		unsigned char reverseBits(unsigned char b);
+		unsigned char ReverseBits(unsigned char b);
 				
 	private:
 		/****************************************************************************************

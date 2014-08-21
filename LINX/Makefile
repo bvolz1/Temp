@@ -6,8 +6,8 @@ release:
 debug:
 	g++ LinxTcpDaemon.cpp comms/LinxTcp.cpp common/LinxCommon.cpp device/LinxDevice.cpp device/raspberrypi/LinxRaspberryPi.cpp device/raspberrypi/LinxRaspberryPi-B.cpp -lrt -DDEBUG_ENABLED=1 -o LinxDebug.out
 	
-ArduinoSerial:
-	g++ LinxSerial.cpp LinxSerialDaemon.cpp LinxCommon.cpp device/LinxDevice.cpp device/Arduino/ArduinoSerialDaemon.cpp -lrt  -DDEBUG_ENABLED=1 -o LinxSerial.out
+main:
+	g++ main.cpp device/LinxDevice.cpp device/raspberrypi/LinxRaspberryPi.cpp device/raspberrypi/LinxRaspberryPi-B.cpp -lrt  -DDEBUG_ENABLED=1 -o main.out
 
 clean:
 	rm -rf *.o

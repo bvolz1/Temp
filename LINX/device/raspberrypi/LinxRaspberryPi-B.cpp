@@ -13,68 +13,68 @@
 **  Member Variables
 ****************************************************************************************/
 //System
-const unsigned char LINXRaspberryPi_B::m_deviceName[DEVICE_NAME_LEN] = {'R', 'a', 's', 'p', 'b', 'e', 'r', 'r', 'y', ' ', 'P', 'i', ' ', 'M', 'o', 'd', 'e', 'l', ' ', 'B'};
+const unsigned char LinxRaspberryPiB::m_DeviceName[DEVICE_NAME_LEN] = "Raspberry Pi Model B";
 
 //DIO
-const unsigned char LINXRaspberryPi_B::m_DIOChans[NUM_DIO_CHANS] = {2, 3, 4, 7, 8, 9, 10, 11, 14, 15, 17, 18, 22, 23, 24, 25, 27};
+const unsigned char LinxRaspberryPiB::m_DigitalChans[NUM_DIGITAL_CHANS] = {2, 3, 4, 7, 8, 9, 10, 11, 14, 15, 17, 18, 22, 23, 24, 25, 27};
 
 //SPI
-const unsigned char LINXRaspberryPi_B::m_SPIChans[NUM_SPI_CHANS] = {0};
-int  LINXRaspberryPi_B::m_SPIHandles[NUM_SPI_CHANS];
-const char LINXRaspberryPi_B::m_SPIPaths[NUM_SPI_CHANS][SPI_PATH_LEN] = { "/dev/spidev0.0\00" };
-unsigned long LINXRaspberryPi_B::m_SPISupportedSpeeds[NUM_SPI_SPEEDS] = {7629, 15200, 30500, 61000, 122000, 244000, 488000, 976000, 1953000, 3900000, 7800000, 15600000, 31200000};
-unsigned long LINXRaspberryPi_B::m_SPISetSpeeds[NUM_SPI_CHANS] = {500000};
-unsigned char LINXRaspberryPi_B::m_SPIBitOrders[NUM_SPI_CHANS] = {MSBFIRST};
+const unsigned char LinxRaspberryPiB::m_SpiChans[NUM_SPI_CHANS] = {0};
+int  LinxRaspberryPiB::m_SpiHandles[NUM_SPI_CHANS];
+const char LinxRaspberryPiB::m_SpiPaths[NUM_SPI_CHANS][SPI_PATH_LEN] = { "/dev/spidev0.0\00" };
+unsigned long LinxRaspberryPiB::m_SpiSupportedSpeeds[NUM_SPI_SPEEDS] = {7629, 15200, 30500, 61000, 122000, 244000, 488000, 976000, 1953000, 3900000, 7800000, 15600000, 31200000};
+unsigned long LinxRaspberryPiB::m_SpiSetSpeeds[NUM_SPI_CHANS] = {500000};
+unsigned char LinxRaspberryPiB::m_SpiBitOrders[NUM_SPI_CHANS] = {MSBFIRST};
 
 //I2C
-unsigned char LINXRaspberryPi_B::m_I2CChans[NUM_I2C_CHANS] = {0, 1};
-int LINXRaspberryPi_B::m_I2CHandles[NUM_I2C_CHANS];
-const char LINXRaspberryPi_B::m_I2CPaths[NUM_I2C_CHANS][I2C_PATH_LEN] = { "/dev/i2c-0\00", "/dev/i2c-1\00" };
+unsigned char LinxRaspberryPiB::m_I2cChans[NUM_I2C_CHANS] = {0, 1};
+int LinxRaspberryPiB::m_I2cHandles[NUM_I2C_CHANS];
+const char LinxRaspberryPiB::m_I2cPaths[NUM_I2C_CHANS][I2C_PATH_LEN] = { "/dev/i2c-0\00", "/dev/i2c-1\00" };
 
 //UART
-unsigned char LINXRaspberryPi_B::m_UartChans[NUM_UART_CHANS] = {0};
-int LINXRaspberryPi_B::m_UartHandles[NUM_UART_CHANS];
-const char LINXRaspberryPi_B::m_UartPaths[NUM_UART_CHANS][UART_PATH_LEN] = { "/dev/ttyAMA0\00" };
-unsigned long LINXRaspberryPi_B::m_UartSupportedSpeeds[NUM_UART_SPEEDS] = {0, 50, 75, 110, 134, 150, 200, 300, 600, 1200, 1800, 2400, 4800, 9600, 19200, 38400, 57600, 115200, 230400};
-unsigned long LINXRaspberryPi_B::m_UartSupportedSpeedsCodes[NUM_UART_SPEEDS] = {B0, B50, B75, B110, B134, B150, B200, B300, B600, B1200, B1800, B2400, B4800, B9600, B19200, B38400, B57600, B115200, B230400};
+unsigned char LinxRaspberryPiB::m_UartChans[NUM_UART_CHANS] = {0};
+int LinxRaspberryPiB::m_UartHandles[NUM_UART_CHANS];
+const char LinxRaspberryPiB::m_UartPaths[NUM_UART_CHANS][UART_PATH_LEN] = { "/dev/ttyAMA0\00" };
+unsigned long LinxRaspberryPiB::m_UartSupportedSpeeds[NUM_UART_SPEEDS] = {0, 50, 75, 110, 134, 150, 200, 300, 600, 1200, 1800, 2400, 4800, 9600, 19200, 38400, 57600, 115200, 230400};
+unsigned long LinxRaspberryPiB::m_UartSupportedSpeedsCodes[NUM_UART_SPEEDS] = {B0, B50, B75, B110, B134, B150, B200, B300, B600, B1200, B1800, B2400, B4800, B9600, B19200, B38400, B57600, B115200, B230400};
 	
 
 /****************************************************************************************
 **  Constructors /  Destructor
 ****************************************************************************************/
-LINXRaspberryPi_B::LINXRaspberryPi_B()
+LinxRaspberryPiB::LinxRaspberryPiB()
 {
 	//Set Raspberry Pi Family And Model Number	
-	deviceID = 0x01;
-	deviceNameLen = DEVICE_NAME_LEN;	 
-	deviceName =  m_deviceName;
+	DeviceID = 0x01;
+	DeviceNameLen = DEVICE_NAME_LEN;	 
+	DeviceName =  m_DeviceName;
 
 	//LINX API Version
-	linxAPIMajor = 1;
-	linxAPIMinor = 1;
-	linxAPISubminor = 0;
+	LinxAPIMajor = 1;
+	LinxAPIMinor = 1;
+	LinxAPISubminor = 0;
 	
-	//DIOChans;	
-	numDIOChans = NUM_DIO_CHANS;			
-	DIOChans = m_DIOChans;
+	//DIGITAL
+	NumDigitalChans = NUM_DIGITAL_CHANS;			
+	DigitalChans = m_DigitalChans;
 	
 	//AI
-	numAIChans = 0;
-	AIChans = 0;
-	AIResolution = 0;
-	AIRef = 0;
+	NumAiChans = 0;
+	AiChans = 0;
+	AiResolution = 0;
+	AiRef = 0;
 	
 	//AO
-	numAOChans = 0;
-	AOChans = 0;
+	NumAoChans = 0;
+	AoChans = 0;
 	
 	//PWM
-	numPWMChans = 0;
-	PWMChans = 0;
+	NumPwmChans = 0;
+	PwmChans = 0;
 	
 	//QE
-	numQEChans = 0;
-	QEChans = 0;
+	NumQeChans = 0;
+	QeChans = 0;
 	
 	//UART
 	NumUartChans = NUM_UART_CHANS;
@@ -88,36 +88,36 @@ LINXRaspberryPi_B::LINXRaspberryPi_B()
 	
 	
 	//I2C
-	numI2CChans = NUM_I2C_CHANS;	
-	I2CChans = m_I2CChans;
-	I2CPaths = m_I2CPaths;
-	I2CHandles = m_I2CHandles;
+	NumI2cChans = NUM_I2C_CHANS;	
+	I2cChans = m_I2cChans;
+	I2cPaths = m_I2cPaths;
+	I2cHandles = m_I2cHandles;
 	
 	//SPI
-	numSPIChans = NUM_SPI_CHANS;	
-	SPIChans = m_SPIChans;		
-	SPIPaths = m_SPIPaths;
-	SPIHandles = m_SPIHandles;
+	NumSpiChans = NUM_SPI_CHANS;	
+	SpiChans = m_SpiChans;		
+	SpiPaths = m_SpiPaths;
+	SpiHandles = m_SpiHandles;
 	
-	numSPISpeeds = NUM_SPI_SPEEDS;
-	SPISupportedSpeeds = m_SPISupportedSpeeds;
-	SPISetSpeeds = m_SPISetSpeeds;	
-	SPIBitOrders = m_SPIBitOrders;
+	NumSpiSpeeds = NUM_SPI_SPEEDS;
+	SpiSupportedSpeeds = m_SpiSupportedSpeeds;
+	SpiSetSpeeds = m_SpiSetSpeeds;	
+	SpiBitOrders = m_SpiBitOrders;
 	
 	//CAN
-	numCANChans = 0;
-	CANChans = 0;
+	NumCanChans = 0;
+	CanChans = 0;
 	
 	
 	//Export GPIO
-	GPIOExport(DIOChans, numDIOChans);
+	GpioExport(DigitalChans, NumDigitalChans);
 }
 
 //Destructor
-LINXRaspberryPi_B::~LINXRaspberryPi_B()
+LinxRaspberryPiB::~LinxRaspberryPiB()
 {
 	//Unexport GPIO
-	GPIOUnexport(DIOChans, numDIOChans);
+	GpioUnexport(DigitalChans, NumDigitalChans);
 }
 
 /****************************************************************************************
