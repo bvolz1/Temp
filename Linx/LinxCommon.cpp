@@ -14,12 +14,12 @@ unsigned long GetNanoSeconds()
 
 unsigned long GetMicroSeconds()
 {
-	return GetNanoSeconds / 1000;
+	return GetNanoSeconds() / 1000;
 }
 
 unsigned long GetMilliSeconds()
 {
-	return GetNanoSeconds / 1000000;
+	return GetNanoSeconds() / 1000000;
 }
 
 unsigned long GetSeconds()

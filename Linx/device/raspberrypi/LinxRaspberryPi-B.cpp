@@ -7,6 +7,7 @@
 
 #include "../../LinxCommon.h"
 #include "../LinxDevice.h"
+#include "LinxRaspberryPi.h"
 #include "LinxRaspberryPi-B.h"
 
 /****************************************************************************************
@@ -17,6 +18,8 @@ const unsigned char LinxRaspberryPiB::m_DeviceName[DEVICE_NAME_LEN] = "Raspberry
 
 //DIO
 const unsigned char LinxRaspberryPiB::m_DigitalChans[NUM_DIGITAL_CHANS] = {2, 3, 4, 7, 8, 9, 10, 11, 14, 15, 17, 18, 22, 23, 24, 25, 27};
+int LinxRaspberryPiB::m_DigitalDirHandles[NUM_DIGITAL_CHANS];
+int LinxRaspberryPiB::m_DigitalValueHandles[NUM_DIGITAL_CHANS];
 
 //SPI
 const unsigned char LinxRaspberryPiB::m_SpiChans[NUM_SPI_CHANS] = {0};
@@ -57,6 +60,11 @@ LinxRaspberryPiB::LinxRaspberryPiB()
 	//DIGITAL
 	NumDigitalChans = NUM_DIGITAL_CHANS;			
 	DigitalChans = m_DigitalChans;
+		
+	GpioExport(NUM_DIGITAL_CHANS, m_DigitalChans, m_DigitalDirHandles, m_DigitalValueHandles);		//Export GPIO And Fill Digital Handles
+	
+	DigitalDirHandles = m_DigitalDirHandles;
+	DigitalValueHandles = m_DigitalValueHandles;
 	
 	//AI
 	NumAiChans = 0;
@@ -107,10 +115,6 @@ LinxRaspberryPiB::LinxRaspberryPiB()
 	//CAN
 	NumCanChans = 0;
 	CanChans = 0;
-	
-	
-	//Export GPIO
-	GpioExport(DigitalChans, NumDigitalChans);
 }
 
 //Destructor

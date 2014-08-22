@@ -32,6 +32,9 @@ class LinxRaspberryPiB : public LinxRaspberryPi
 		
 		//DIGITAL
 		static const unsigned char m_DigitalChans[NUM_DIGITAL_CHANS];
+		static int m_DigitalDirHandles[NUM_DIGITAL_CHANS];
+		static int m_DigitalValueHandles[NUM_DIGITAL_CHANS];
+		
 		
 		//SPI
 		static const unsigned char m_SpiChans[NUM_SPI_CHANS];

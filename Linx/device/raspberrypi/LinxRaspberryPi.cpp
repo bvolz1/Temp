@@ -43,24 +43,45 @@ LinxRaspberryPi::LinxRaspberryPi( )
 /****************************************************************************************
 **  Functions
 ****************************************************************************************/
-int LinxRaspberryPi::GpioExport (const unsigned char*  gpioChans, const unsigned char numGpioChans)
+int LinxRaspberryPi::GpioExport (const unsigned char numGpioChans, const unsigned char*  gpioChans, int* digitalDirHandles, int* digitalValueHandles)
 {
 	DEBUG("Exporting GPIO");
 	
-	//Export File
-	FILE * exportFile;	
-		
-	//Export GPIO Pins
+	//Open Export File
+	int exportFile = open("/sys/class/gpio/export", O_RDWR);	
+	
+	char buff[3];	
+	
+	//Export GPIO Pins And Open Handles To Direction And Value
 	for(int i=0; i<numGpioChans; i++)
-	{
-		//Open Export File
-		exportFile = fopen("/sys/class/gpio/export", "w");
+	{		
+		//Export GPIO Pin
+		snprintf(buff, 3, "%d",  gpioChans[i]);
+		write(exportFile, buff, 3);
 		
-		fprintf(exportFile, "%u", gpioChans[i]);		
+		//Open And Save GPIO Dir Handle
+		char dirFilePath [40];
+		snprintf(dirFilePath, 40, "/sys/class/gpio/gpio%d/direction", gpioChans[i]);
+		int handle = open(dirFilePath, O_RDWR);
+		if( handle > 0)
+		{
+			digitalDirHandles[i] = handle;
+		}
+		else
+		{
+			//Unable To Open Dir Handle
+			printf("Unable To Open %s\n", dirFilePath);
+		}
 		
-		//Close Export File
-		fclose(exportFile);		
+		
+		//Open And Save GPIO Value Handle
+		char valueFilePath [40];
+		snprintf(valueFilePath, 40, "/sys/class/gpio/gpio%d/value", gpioChans[i]);
+		digitalValueHandles[i] = open(valueFilePath, O_RDWR);
 	}
+
+	//Close Export File
+	close(exportFile);		
 	
 	return 0;
 }
@@ -69,19 +90,16 @@ int LinxRaspberryPi::GpioUnexport(const unsigned char*  gpioChans, const unsigne
 {
 	DEBUG("Unexporting GPIO");
 	
-	//Unexport File
-	FILE * unexportFile;
-
+	//Open Unexport File
+	int unexportFile = open("/sys/class/gpio/unexport", O_RDWR);	
+	
+	char buff[3];	
+	
 	//Export GPIO Pins
 	for(int i=0; i<numGpioChans; i++)
 	{
-		//Open Unexport File
-		unexportFile = fopen("/sys/class/gpio/unexport", "w");
-		
-		fprintf(unexportFile, "%u", gpioChans[i]);			
-		
-		//Close Unexport File
-		fclose(unexportFile);
+		snprintf(buff, 3, "%d",  gpioChans[i]);
+		write(unexportFile, buff, 3);
 	}
 	
 	return 0;
@@ -91,65 +109,66 @@ int LinxRaspberryPi::GpioSetDir(unsigned char pin, unsigned char mode)
 {
 	DEBUG("RPI GPIO Set Dir");
 	
-	//GPIO Direction File Handle
-	FILE *dirFile;
+	int pinIndex = GetDigitalChanIndex(pin);
 	
-	char filePath [40];
-	snprintf(filePath, 40, "/sys/class/gpio/gpio%d/direction", pin );
-	dirFile = fopen(filePath, "w");
-	
-	if(dirFile == NULL)
+	if(pinIndex < 0)
 	{
-		printf("Failed To Open %s\n", filePath);
+		return LDIGITAL_PIN_DNE;
 	}
 	else
-	{	
+	{
+		int dirHandle = DigitalDirHandles[pinIndex];
+		
 		if(mode == INPUT)
 		{
-			fprintf(dirFile, "in");
-			fclose(dirFile);
-				
+			write(dirHandle, "in", 2);
 		}
 		else if (mode == OUTPUT)
 		{
-			fprintf(dirFile, "out");
-			fclose(dirFile);			
+			write(dirHandle, "out", 3);
 		}
 		else
 		{
 			//TODO ERROR
-		}			
+		}
 	}
-	
+		
 	return 0;
-	
 }
 
 int LinxRaspberryPi::GpioWrite(unsigned char pin, unsigned char val)
 {
 	DEBUG("RPI GPIO Write");
 	
-	//GPIO Value File Handle
-	FILE *valFile;
+	int pinIndex = GetDigitalChanIndex(pin);
 	
-	//Build GPIO Value Path And Open
-	char filePath [40];
-	snprintf(filePath, 40, "/sys/class/gpio/gpio%d/value", pin );
-	valFile = fopen(filePath, "w");
-	
-	//Write Value
-	fprintf(valFile, "%u", val);	
+	if(pinIndex < 0)
+	{
+		return LDIGITAL_PIN_DNE;
+	}
+	else
+	{
+		int valueHandle = DigitalValueHandles[pinIndex];
 		
-	//Close GPIO Value File
-	fclose(valFile);
+		if(val == HIGH)
+		{
+			write(valueHandle, "1\00", 2);
+		}
+		else if (val == LOW)
+		{
+			write(valueHandle, "0\00", 2);
+		}
+		else
+		{
+			//TODO ERROR
+		}
+	}
 		
 	return 0;
 }
 
 int LinxRaspberryPi::DigitalWrite(unsigned char numPins, unsigned char* pins, unsigned char* values)
 {
-	DEBUG("Digital Write At Pi Level");		
-	
 	for(int i=0; i<numPins; i++)
 	{		
 		GpioSetDir(pins[i], 1);
@@ -473,4 +492,16 @@ int LinxRaspberryPi::UartClose(unsigned char channel)
 		return LUART_CLOSE_FAIL;
 	}
 	return  L_OK;
+}
+
+int LinxRaspberryPi::GetDigitalChanIndex(unsigned char chanNum)
+{
+	for(int i=0; i< NumDigitalChans; i++)
+	{
+		if(DigitalChans[i] == chanNum)
+		{
+			return i;
+		}		
+	}
+	return -1;
 }

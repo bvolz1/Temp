@@ -7,7 +7,7 @@
 #include <string>
 #include "../LinxDevice.h"
 
-
+#define DIGITAL_PIN_LEN 3
 #define SPI_PATH_LEN 64
 #define I2C_PATH_LEN 64
 #define UART_PATH_LEN 64
@@ -22,8 +22,14 @@ class LinxRaspberryPi : public LinxDevice
 		/****************************************************************************************
 		**  Variables
 		****************************************************************************************/		
+		//DIO
+		unsigned char NumDigitalChans;										//Number Of Digital Channels
+		int* DigitalDirHandles;													//File Handles For Digital Pin Directions
+		int* DigitalValueHandles;												//File Handles For Digital Pin Values
+		const char (*DigitalPinNames)[DIGITAL_PIN_LEN];			//SPI Channel Names (Chars)		
+		
 		//SPI
-		int* SpiHandles;											//SPI File Handles
+		int* SpiHandles;												//SPI File Handles
 		const char (*SpiPaths)[SPI_PATH_LEN];			//SPI Channel File Paths
 		unsigned char NumSpiSpeeds;						//Number Of Supported SPI Speeds
 		unsigned long* SpiSupportedSpeeds;				//Supported SPI Clock Frequencies
@@ -31,7 +37,7 @@ class LinxRaspberryPi : public LinxDevice
 		unsigned char* SpiBitOrders;							//SPI Bit Orders
 			
 		//I2C
-		int* I2cHandles;											//I2C File Handles
+		int* I2cHandles;												//I2C File Handles
 		const char (*I2cPaths)[I2C_PATH_LEN];			//I2C Channel File Paths
 		
 		//UART
@@ -50,7 +56,7 @@ class LinxRaspberryPi : public LinxDevice
 		**  Functions
 		****************************************************************************************/
 		//Member Functions
-		int GpioExport(const unsigned char*  GPIOChans, const unsigned char numGPIOChans);
+		int GpioExport(const unsigned char numGpioChans, const unsigned char*  gpioChans, int* digitalDirHandles, int* digitalValueHandles);
 		int GpioUnexport(const unsigned char*  GPIOChans, const unsigned char numGPIOChans);
 		int GpioSetDir(unsigned char pin, unsigned char mode);
 		//Read
@@ -81,11 +87,11 @@ class LinxRaspberryPi : public LinxDevice
 		int UartWrite(unsigned char channel, unsigned char numBytes, unsigned char* sendBuffer);
 		int UartClose(unsigned char channel);
 		
-	private:
+	protected:
 		/****************************************************************************************
 		**  Variables
 		****************************************************************************************/		
-		
+		int GetDigitalChanIndex(unsigned char chanNum);
 		
 		/****************************************************************************************
 		**  Functions
