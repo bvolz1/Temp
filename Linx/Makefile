@@ -14,7 +14,11 @@ main:
 	
 maindebug:
 	g++ main.cpp LinxCommon.cpp device/LinxDevice.cpp device/raspberrypi/LinxRaspberryPi.cpp device/raspberrypi/LinxRaspberryPi-B.cpp -lrt  -DDEBUG_ENABLED=1 -o maindebug.out
+	
+uno:	
+	cd device/wiring/arduino/uno && make	
 
 clean:
 	rm -rf *.o
 	rm -rf *.out
+	rm -rf bin/*
