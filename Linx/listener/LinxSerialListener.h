@@ -1,5 +1,10 @@
-#ifndef LINX_TCP_LISTENER_H
-#define LINX_TCP_LISTENER_H
+#ifndef LINX_SERIAL_LISTENER_H
+#define LINX_SERIAL_LISTENER_H
+
+/****************************************************************************************
+**  Defines
+****************************************************************************************/		
+#define LINX_SERIAL_BUFFER_SIZE 64
 
 /****************************************************************************************
 **  Includes
@@ -14,23 +19,27 @@
 /****************************************************************************************
 **  Classes
 ****************************************************************************************/		
-class LinxTcpListener : public LinxListener
+class LinxSerialListener : public LinxListener
 {
 	public:
 		/****************************************************************************************
 		**  Variables
 		****************************************************************************************/		
-		
+		LinxListenerState State;
+		unsigned char LinxSerialListenerChan;
 		
 		/****************************************************************************************
 		**  Constructors
 		****************************************************************************************/
-		LinxTcpListener();		//Default Constructor
+		LinxSerialListener();		//Default Constructor
 		
 		/****************************************************************************************
 		**  Functions
 		****************************************************************************************/		
-
+		virtual int Start(LinxDevice &linxDev, unsigned char uartChan);			
+		virtual int Connected(LinxDevice &linxDev);			
+		virtual int Close();			
+		virtual int Exit();			
 		
 	private:
 		/****************************************************************************************
@@ -43,4 +52,4 @@ class LinxTcpListener : public LinxListener
 	
 };
 
-#endif //LINX_TCP_LISTENER_H
+#endif //LINX_SERIAL_LISTENER_H

@@ -1,45 +1,124 @@
 /****************************************************************************************
 **  Includes
-****************************************************************************************/		
+****************************************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
+#include <string.h>
+#include <unistd.h>
 
-#include "LINX_Common.h"
-#include "LinxSerialDaemon.h"	//To Do - Use Compiler Flags To Include Devices Specific Serial Daemon
+#include "../LinxCommon.h"
+#include "../device/LinxDevice.h"
+
+#include "LinxListener.h"
+#include "LinxSerialListener.h"
 
 /****************************************************************************************
-**  Variables
-****************************************************************************************/		
-
-LinxSerialDaemon LinxSerialConnection;	//To Do - Use Compiler Flags To Instantiate Device Specific Serial Daemon
-
-int main()
+**  Constructors
+****************************************************************************************/
+LinxSerialListener::LinxSerialListener()
 {
-	DEBUG("Starting LINX Serial Daemon...\n");
+	State = START;
+	Interface = UART;
+}
+
+/****************************************************************************************
+**  Functions
+****************************************************************************************/
+int LinxSerialListener::Start(LinxDevice &linxDev, unsigned char uartChan)
+{
+	ListenerChan = uartChan;
+	unsigned long acutalBaud = 0;
+	LinxSerialListenerChan = uartChan;
+	linxDev.UartOpen(LinxSerialListenerChan, 9600, &acutalBaud);
 	
-	switch(LinxSerialConnection.State)
-	{
-		case START:
-			LinxSerialConnection.Start(1, 2);
-		break;
-		
-		case LISTENING:
-			LinxSerialConnection.Listen();
-		break;
-		
-		case Exit:
-			LinxSerialConnection.Drop();
-			return 0;
-		break;
-		
-		default
-			//Unknown State Exit
-			LinxSerialConnection = EXIT;
-		break;
+	State = CONNECTED;
+}
+
+int LinxSerialListener::Connected(LinxDevice &linxDev)
+{
+	unsigned char bytesAvailable = 0;	
 	
+	//Check How Many Bytes Received, Need At Least 2 To Get SoF And Packet Size
+	linxDev.UartGetBytesAvailable(LinxSerialListenerChan, &bytesAvailable);
+	
+	if(bytesAvailable >= 2)
+	{	
+		DEBUG(">2 Bytes Available");
+		//Check for valid SoF
+		unsigned char bytesRead = 0;
+		linxDev.UartRead(LinxSerialListenerChan, 2, recBuffer, &bytesRead);
+		printf("Received [%X] [%X]\n", recBuffer[0], recBuffer[1]);
+		if(recBuffer[0] == 0xFF)
+		{
+			//SoF is valid. Check If Entire Packet Has Been Received
+			linxDev.UartGetBytesAvailable(LinxSerialListenerChan, &bytesAvailable);
+		   
+		   if(bytesAvailable < (recBuffer[1] - 2) )
+			{
+				DEBUG("Waiting for rest of packet\n");
+				//Wait For More Bytes	
+				int timeout = 100;
+				while(bytesAvailable < (recBuffer[1] - 2) )
+				{
+					DEBUG("WAITING!!!");
+					linxDev.UartGetBytesAvailable(LinxSerialListenerChan, &bytesAvailable);
+					printf("Received %d", bytesAvailable);
+					if(timeout <= 0)
+					{
+						//Checksum Failed
+						DEBUG("Timeout Waiting For Rest Of Packet\n");
+						//Flush
+						linxDev.UartGetBytesAvailable(LinxSerialListenerChan, &bytesAvailable);
+						linxDev.UartRead(LinxSerialListenerChan, bytesAvailable, recBuffer, &bytesRead);
+						return -1;
+					}
+					timeout--;
+				}
+			}
+						
+			//Full Packet Received
+			DEBUG("Reading Rest Of Packet\n");
+			linxDev.UartRead(LinxSerialListenerChan, (recBuffer[1] - 2), (recBuffer+2), &bytesRead);
+						
+			//Full Packet Received - Compute Checksum - Process Packet If Checksum Passes
+			if(ChecksumPassed(recBuffer))
+			{
+				DEBUG("Checksum Passed\n");
+				//Process Packet
+				ProcessCommand(recBuffer, sendBuffer, linxDev);
+			
+				//Send Response Packet      
+				linxDev.UartWrite(LinxSerialListenerChan, sendBuffer[1], sendBuffer);		
+			}
+			else
+			{         
+				//Checksum Failed
+				DEBUG("Checksum Failed\n");
+				DEBUGCMDPACKET(recBuffer);
+				//Flush
+				linxDev.UartGetBytesAvailable(LinxSerialListenerChan, &bytesAvailable);
+				linxDev.UartRead(LinxSerialListenerChan, bytesAvailable, recBuffer, &bytesRead);
+			}
+		}
+		else
+		{
+			//SoF Failed, Flush
+			DEBUG("SoF Failed\n");
+			//Flush
+			linxDev.UartGetBytesAvailable(LinxSerialListenerChan, &bytesAvailable);
+			linxDev.UartRead(LinxSerialListenerChan, bytesAvailable, recBuffer, &bytesRead); 
+		}
 	}
 	
 	return 0;
+}
 
+int LinxSerialListener::Close()
+{
+	return -1;
+}
+
+int LinxSerialListener::Exit()
+{
+	return -1;
 }

@@ -12,7 +12,7 @@
 
 
 #include "../../LinxCommon.h"
-#include "../LinxListenerCommon.h"
+#include "../LinxListener.h"
 #include "../../device/LinxDevice.h"
 #include "LinxTcpListenerLinux.h"
 
@@ -121,7 +121,7 @@ int LinxTcpListenerLinux::Connected(LinxDevice &linxDev)
 	recBuffer[0] = 0;
 	
 	//Watch For New Packet
-	received = Peek(recBuffer, PACKET_BUFFER_SIZE);
+	received = Peek(recBuffer, LISTENER_BUFFER_SIZE);
 	
 	//Wait For At Least First Two Bytes Of Packet
 	if(received >= 2)
@@ -134,7 +134,7 @@ int LinxTcpListenerLinux::Connected(LinxDevice &linxDev)
 			if(packetSize < received )
 			{
 				//Partial Packet, Make Sure Packet Size Will Fit In Buffer, If It Will Loop To Wait For Remainder Of Packet
-				if(packetSize > PACKET_BUFFER_SIZE)
+				if(packetSize > LISTENER_BUFFER_SIZE)
 				{
 					DEBUG("Packet Size Too Large For Buffer");
 					State = EXIT;
@@ -182,7 +182,7 @@ int LinxTcpListenerLinux::Connected(LinxDevice &linxDev)
 					{
 						//Checksum Failed
 						DEBUG("Checksum Failed");
-						recv(clientsock, recBuffer, PACKET_BUFFER_SIZE, MSG_DONTWAIT);	
+						recv(clientsock, recBuffer, LISTENER_BUFFER_SIZE, MSG_DONTWAIT);	
 					}
 				}
 			}
@@ -191,7 +191,7 @@ int LinxTcpListenerLinux::Connected(LinxDevice &linxDev)
 		{
 			//Bad SoF, Flush Socket
 			DEBUG("Bad SoF");
-			recv(clientsock, recBuffer, PACKET_BUFFER_SIZE, MSG_DONTWAIT);
+			recv(clientsock, recBuffer, LISTENER_BUFFER_SIZE, MSG_DONTWAIT);
 			printf("Got %s\n", recBuffer);
 		}
 	}

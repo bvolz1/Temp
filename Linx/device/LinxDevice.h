@@ -105,6 +105,7 @@ class LinxDevice
 		//UART
 		unsigned char NumUartChans;
 		const unsigned char* UartChans;
+		unsigned long UartMaxBaud;
 		
 		//I2C
 		unsigned char NumI2cChans;

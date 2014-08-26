@@ -4,10 +4,6 @@
 /****************************************************************************************
 **  Functions
 ****************************************************************************************/
-#ifndef PACKET_BUFFER_SIZE
-	#define PACKET_BUFFER_SIZE 64
-#endif
-
 #ifndef MAX_PENDING_CONS
 	#define MAX_PENDING_CONS 2
 #endif
@@ -15,6 +11,7 @@
 /****************************************************************************************
 **  Includes
 ****************************************************************************************/
+#include "../LinxListener.h"
 #include "../LinxTcpListener.h"
 #include "../../device/LinxDevice.h"
 
@@ -24,9 +21,6 @@ class LinxTcpListenerLinux : public LinxTcpListener
 		/****************************************************************************************
 		**  Variables
 		****************************************************************************************/		
-		unsigned char recBuffer[PACKET_BUFFER_SIZE];
-		unsigned char sendBuffer[PACKET_BUFFER_SIZE];
-		
 		unsigned long TCPUpdateTime;
 		struct timeval timeout;
 		

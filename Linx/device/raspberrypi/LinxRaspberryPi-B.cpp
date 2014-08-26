@@ -88,6 +88,7 @@ LinxRaspberryPiB::LinxRaspberryPiB()
 	NumUartChans = NUM_UART_CHANS;
 	UartChans = m_UartChans;
 	UartPaths = m_UartPaths;
+	UartMaxBaud = 115200;
 	
 	NumUartSpeeds = NUM_UART_SPEEDS;
 	UartSupportedSpeeds = m_UartSupportedSpeeds;

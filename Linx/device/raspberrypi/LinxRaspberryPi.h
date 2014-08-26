@@ -23,7 +23,7 @@ class LinxRaspberryPi : public LinxDevice
 		**  Variables
 		****************************************************************************************/		
 		//DIO
-		unsigned char NumDigitalChans;										//Number Of Digital Channels
+		//unsigned char NumDigitalChans;										//Number Of Digital Channels
 		int* DigitalDirHandles;													//File Handles For Digital Pin Directions
 		int* DigitalValueHandles;												//File Handles For Digital Pin Values
 		const char (*DigitalPinNames)[DIGITAL_PIN_LEN];			//SPI Channel Names (Chars)		

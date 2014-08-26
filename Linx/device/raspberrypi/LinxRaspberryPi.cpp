@@ -430,8 +430,6 @@ int LinxRaspberryPi::UartGetBytesAvailable(unsigned char channel, unsigned char 
 	int bytesAtPort = -1;
 	ioctl(UartHandles[channel], FIONREAD, &bytesAtPort);
 	
-	printf("/n Bytes Avail = %d\n", bytesAtPort);
-	
 	if(bytesAtPort < 0)
 	{
 		return LUART_AVAILABLE_FAIL;
