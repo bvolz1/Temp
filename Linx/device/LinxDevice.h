@@ -11,14 +11,30 @@
 ****************************************************************************************/		
 
 //GPIO
-#define INPUT 0x00
-#define OUTPUT 0x01
-#define HIGH 0x01
-#define LOW 0x00
+#ifndef INPUT
+	#define INPUT 0x00
+#endif
+
+#ifndef  OUTPUT
+	#define OUTPUT 0x01
+#endif
+
+#ifndef HIGH
+	#define HIGH 0x01
+#endif
+
+#ifndef LOW
+	#define LOW 0x00
+#endif
 
 //SPI
-#define LSBFIRST 0
-#define MSBFIRST 1
+#ifndef LSBFIRST
+	#define LSBFIRST 0
+#endif
+
+#ifndef MSBFIRST
+	#define MSBFIRST 1
+#endif
 
 //I2C
 #define EOF_STOP 0

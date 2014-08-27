@@ -1,7 +1,7 @@
 AVRDDUDE     = /usr/bin/avrdude
 AVRDUDE_CONF = /etc/avrdude.conf
 BOARD_TAG    = uno
-ARDUINO_LIBS =
+USER_CPP = ~/git/Temp/Linx/device/wiring/arduino/Sam.cpp
 OBJDIR = ../../../../bin/$(BOARD_TAG)
 
 
