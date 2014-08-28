@@ -3,7 +3,6 @@
 ****************************************************************************************/
 #include <stdio.h>
 
-#include "../LinxCommon.h"
 #include "LinxListener.h"
 
 /****************************************************************************************
@@ -81,7 +80,7 @@ void LinxListener::StatusResponse(unsigned char* commandPacketBuffer, unsigned c
 
 int LinxListener::ProcessCommand(unsigned char* commandPacketBuffer, unsigned char* responsePacketBuffer, LinxDevice &linxDev)
 {
-	DEBUGCMDPACKET(commandPacketBuffer);
+	//DEBUG linxDev.DebugPrintCmdPacket(commandPacketBuffer);
 		
 	//Store Some Local Values For Convenience
 	unsigned char commandLength = commandPacketBuffer[1];
@@ -124,10 +123,10 @@ int LinxListener::ProcessCommand(unsigned char* commandPacketBuffer, unsigned ch
 	{
 		unsigned long targetBaud = (unsigned long)((commandPacketBuffer[6] << 24) | (commandPacketBuffer[7] << 16) | (commandPacketBuffer[8] << 8) | commandPacketBuffer[9]);
 		unsigned long actualBaud = 0;
-		DEBUG("Changing Listener Baud\n");
+		//DEBUG linxDev.DebugPrint((char*)"Changing Listener Baud\n");
 		status = linxDev.UartSetBaudRate(ListenerChan, targetBaud, &actualBaud);
 		StatusResponse(commandPacketBuffer, responsePacketBuffer, status);
-		DEBUG("Set Baud\n");
+		//DEBUG linxDev.DebugPrint((char*)"Set Baud\n");
 		break;
 	}		
 			
@@ -199,12 +198,12 @@ int LinxListener::ProcessCommand(unsigned char* commandPacketBuffer, unsigned ch
 	****************************************************************************************/	
 	case 0x00C0: // UART Open
 	{
-		DEBUG("UART Open Command");
+		//DEBUG linxDev.DebugPrint((char*)"UART Open Command");
 		unsigned long targetBaud = (unsigned long)((commandPacketBuffer[7] << 24) | (commandPacketBuffer[8] << 16) | (commandPacketBuffer[9] << 8) | commandPacketBuffer[10]);
 		unsigned long actualBaud = 0;
 		
 		status = linxDev.UartOpen(commandPacketBuffer[6], targetBaud, &actualBaud);
-		DEBUG("UART Open Command Returned...\n");
+		//DEBUG linxDev.DebugPrint((char*)"UART Open Command Returned...\n");
 		responsePacketBuffer[5] = (actualBaud>>24) & 0xFF;												//actualBaud MSB
 		responsePacketBuffer[6] = (actualBaud>>16) & 0xFF;												//...
 		responsePacketBuffer[7] = (actualBaud>>8) & 0xFF;												//...
@@ -333,7 +332,7 @@ int LinxListener::ProcessCommand(unsigned char* commandPacketBuffer, unsigned ch
 	}
 	
 	//Print Response Packet If Debugging Is Enabled
-	DEBUGRESPACKET(responsePacketBuffer);	
+	//DEBUGlinxDev.DebugPrintResPacket(responsePacketBuffer);	
 	
 	return status;
 }

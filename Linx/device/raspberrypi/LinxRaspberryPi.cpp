@@ -16,7 +16,6 @@
 
 #include <termios.h>		//UART Support
 
-#include "../../LinxCommon.h"
 #include "../LinxDevice.h"
 #include "LinxRaspberryPi.h"
 
@@ -43,9 +42,48 @@ LinxRaspberryPi::LinxRaspberryPi( )
 /****************************************************************************************
 **  Functions
 ****************************************************************************************/
+unsigned long LinxRaspberryPi::GetMilliSeconds()
+{
+	timespec mTime;
+	clock_gettime(CLOCK_MONOTONIC, &mTime);	
+	return (mTime.tv_nsec / 1000000);
+}
+
+unsigned long LinxRaspberryPi::GetSeconds()
+{
+	timespec mTime;
+	clock_gettime(CLOCK_MONOTONIC, &mTime);	
+	return mTime.tv_sec;
+}
+
+void DebugPrint(char* message)
+{
+	printf(message);
+	printf("\n");
+}
+
+void DebugPrintCmdPacket(unsigned char* packetBuffer)
+{
+	fprintf(stdout, "Received : ");		
+		for(int i =0; i<packetBuffer[1]; i++)
+		{
+			fprintf(stdout, "[%X] ", packetBuffer[i]);
+		}	
+		fprintf(stdout, "\n");
+}
+void DebugPrintResPacket(unsigned char* packetBuffer)
+{
+	fprintf(stdout, "Replying With : ");
+	for(int i=0; i<packetBuffer[1]; i++)
+	{
+		fprintf(stdout, "[%X] ", packetBuffer[i]);
+	}	
+	fprintf(stdout, "\n");
+}
+
 int LinxRaspberryPi::GpioExport (const unsigned char numGpioChans, const unsigned char*  gpioChans, int* digitalDirHandles, int* digitalValueHandles)
 {
-	DEBUG("Exporting GPIO");
+	DEBUG((char*)"Exporting GPIO");
 	
 	//Open Export File
 	int exportFile = open("/sys/class/gpio/export", O_RDWR);	
@@ -88,7 +126,7 @@ int LinxRaspberryPi::GpioExport (const unsigned char numGpioChans, const unsigne
 
 int LinxRaspberryPi::GpioUnexport(const unsigned char*  gpioChans, const unsigned char numGpioChans)
 {
-	DEBUG("Unexporting GPIO");
+	DEBUG((char*)"Unexporting GPIO");
 	
 	//Open Unexport File
 	int unexportFile = open("/sys/class/gpio/unexport", O_RDWR);	
@@ -107,7 +145,7 @@ int LinxRaspberryPi::GpioUnexport(const unsigned char*  gpioChans, const unsigne
 
 int LinxRaspberryPi::GpioSetDir(unsigned char pin, unsigned char mode)
 {
-	DEBUG("RPI GPIO Set Dir");
+	DEBUG((char*)"RPI GPIO Set Dir");
 	
 	int pinIndex = GetDigitalChanIndex(pin);
 	
@@ -138,7 +176,7 @@ int LinxRaspberryPi::GpioSetDir(unsigned char pin, unsigned char mode)
 
 int LinxRaspberryPi::GpioWrite(unsigned char pin, unsigned char val)
 {
-	DEBUG("RPI GPIO Write");
+	DEBUG((char*)"RPI GPIO Write");
 	
 	int pinIndex = GetDigitalChanIndex(pin);
 	
@@ -186,7 +224,7 @@ int LinxRaspberryPi::SpiOpenMaster(unsigned char channel)
 	int handle = open(SpiPaths[channel], O_RDWR);
 	if (handle < 0)
 	{
-		DEBUG("Failed To Open SPI Channel");
+		DEBUG((char*)"Failed To Open SPI Channel");
 		return  L_UNKNOWN_ERROR;
 	}
 	else
@@ -211,7 +249,7 @@ int LinxRaspberryPi::SpiSetMode(unsigned char channel, unsigned char mode)
 	int retVal = ioctl(SpiHandles[channel], SPI_IOC_WR_MODE, &spi_Mode);
 	if(retVal < 0)
 	{
-		DEBUG("Failed To Set SPI Mode");
+		DEBUG((char*)"Failed To Set SPI Mode");
 		return  L_UNKNOWN_ERROR;
 	}
 	else
@@ -281,7 +319,7 @@ int LinxRaspberryPi::SpiWriteRead(unsigned char channel, unsigned char frameSize
 		
 		if (retVal < 1)
 		{
-			DEBUG("Failed To Send SPI Data");
+			DEBUG((char*)"Failed To Send SPI Data");
 			return  L_UNKNOWN_ERROR;
 		}
 	}	
@@ -295,7 +333,7 @@ int LinxRaspberryPi::I2cOpenMaster(unsigned char channel)
 	int handle = open(I2cPaths[channel], O_RDWR);
 	if (handle < 0)
 	{
-		DEBUG("Failed To Open I2C Channel");
+		DEBUG((char*)"Failed To Open I2C Channel");
 		return  LI2C_OPEN_FAIL;
 	}
 	else
@@ -375,7 +413,7 @@ int LinxRaspberryPi::UartOpen(unsigned char channel, unsigned long baudRate, uns
 	
 	if (handle < 0)
 	{
-		DEBUG("Failed To Open UART Channel");
+		DEBUG((char*)"Failed To Open UART Channel");
 		return  LUART_OPEN_FAIL;
 	}	
 	else

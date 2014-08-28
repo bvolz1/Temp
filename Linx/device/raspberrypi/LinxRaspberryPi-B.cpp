@@ -5,7 +5,6 @@
 #include <string>
 #include <termios.h>		//UART Support
 
-#include "../../LinxCommon.h"
 #include "../LinxDevice.h"
 #include "LinxRaspberryPi.h"
 #include "LinxRaspberryPi-B.h"

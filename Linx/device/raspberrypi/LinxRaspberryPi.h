@@ -1,5 +1,20 @@
+/****************************************************************************************
+**  Defines
+****************************************************************************************/	
 #ifndef LINX_RASPBERRY_PI_H
 #define LINX_RASPBERRY_PI_H
+
+//Debug
+#ifdef DEBUG_ENABLED
+	#define DEBUG(x) printf(x)
+	#define DEBUGCMDPACKET(x) printf("Received: ");(printf(x);(printf("\n")
+	#define DEBUGRESPACKET(x) printf("Sending: ");(printf(x);(printf("\n")
+#else
+	#define DEBUG(x) do {} while (0)									//Compile Out
+	#define DEBUGCMDPACKET(x) do {} while (0)					//Compile Out
+	#define DEBUGRESPACKET(x) do {} while (0)					//Compile Out
+#endif	//DEBUG_ENABLED
+
 
 /****************************************************************************************
 **  Includes
@@ -87,6 +102,15 @@ class LinxRaspberryPi : public LinxDevice
 		int UartWrite(unsigned char channel, unsigned char numBytes, unsigned char* sendBuffer);
 		int UartClose(unsigned char channel);
 		
+		//System
+		unsigned long GetMilliSeconds();
+		unsigned long GetSeconds();
+		
+		//Debug
+		void DebugPrint(char* message);
+		void DebugPrintCmdPacket(unsigned char* packetBuffer);
+		void DebugPrintResPacket(unsigned char* packetBuffer);
+
 	protected:
 		/****************************************************************************************
 		**  Variables

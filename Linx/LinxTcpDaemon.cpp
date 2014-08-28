@@ -13,8 +13,8 @@
 #include <unistd.h>
 #include <netinet/in.h>
 
-#include "LinxCommon.h"
 #include "device/LinxDevice.h"
+#include "device/raspberrypi/LinxRaspberryPi.h"
 #include "device/raspberrypi/LinxRaspberryPi-B.h"
 
 #include "listener/LinxListener.h"
@@ -24,13 +24,13 @@
 /****************************************************************************************
 ** Variables
 ****************************************************************************************/
-LinxTcpListenerLinux LinxServer;
 LinxRaspberryPiB LinxDev;	
+LinxTcpListenerLinux LinxServer;
 
 int main(int argc, char *argv[])
 {
 
-	DEBUG("\nStarting LVH LINX Daemon...");
+	//LinxDev.DebugPrint((char*)"\nStarting LVH LINX Daemon...");
 	
 	//Start LINX TCP Server	
 	while(1)
@@ -40,13 +40,13 @@ int main(int argc, char *argv[])
 		switch(LinxServer.State)
 		{
 			case START:
-				DEBUG("Start State");
+				//LinxDev.DebugPrint((char*)"Start State");
 				LinxServer.Start(6999);
 				break;
 			
 			case LISTENING:
-				DEBUG("Listening State");
-				LinxServer.Accept();
+				//LinxDev.DebugPrint((char*)"Listening State");
+				LinxServer.Accept(LinxDev);
 				break;	
 			
 			case AVAILABLE:
@@ -56,18 +56,18 @@ int main(int argc, char *argv[])
 				break;
 				
 			case CONNECTED:
-				DEBUG("Connected State");
+				//LinxDev.DebugPrint((char*)"Connected State");
 				LinxServer.Connected(LinxDev);
 				break;
 
 			case CLOSE:
-				DEBUG("Restarting LINX Server");
+				//LinxDev.DebugPrint((char*)"Restarting LINX Server");
 				LinxServer.Close();
 				LinxServer.State = START;
 				break;					
 				
 			case EXIT:
-				DEBUG("Exit State\n");
+				//LinxDev.DebugPrint((char*)"Exit State\n");
 				LinxServer.Exit();
 				exit(-1);
 				break;				

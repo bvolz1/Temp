@@ -4,9 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-//#include <unistd.h>
 
-#include "../LinxCommon.h"
 #include "../device/LinxDevice.h"
 
 #include "LinxListener.h"
@@ -43,7 +41,7 @@ int LinxSerialListener::Connected(LinxDevice &linxDev)
 	
 	if(bytesAvailable >= 2)
 	{	
-		DEBUG(">2 Bytes Available");
+		//DEBUGDEBUG(">2 Bytes Available");
 		//Check for valid SoF
 		unsigned char bytesRead = 0;
 		linxDev.UartRead(LinxSerialListenerChan, 2, recBuffer, &bytesRead);
@@ -55,18 +53,18 @@ int LinxSerialListener::Connected(LinxDevice &linxDev)
 		   
 		   if(bytesAvailable < (recBuffer[1] - 2) )
 			{
-				DEBUG("Waiting for rest of packet\n");
+				//DEBUGDEBUG("Waiting for rest of packet\n");
 				//Wait For More Bytes	
 				int timeout = 100;
 				while(bytesAvailable < (recBuffer[1] - 2) )
 				{
-					DEBUG("WAITING!!!");
+					//DEBUGDEBUG("WAITING!!!");
 					linxDev.UartGetBytesAvailable(LinxSerialListenerChan, &bytesAvailable);
 					printf("Received %d", bytesAvailable);
 					if(timeout <= 0)
 					{
 						//Checksum Failed
-						DEBUG("Timeout Waiting For Rest Of Packet\n");
+						//DEBUGDEBUG("Timeout Waiting For Rest Of Packet\n");
 						//Flush
 						linxDev.UartGetBytesAvailable(LinxSerialListenerChan, &bytesAvailable);
 						linxDev.UartRead(LinxSerialListenerChan, bytesAvailable, recBuffer, &bytesRead);
@@ -77,13 +75,13 @@ int LinxSerialListener::Connected(LinxDevice &linxDev)
 			}
 						
 			//Full Packet Received
-			DEBUG("Reading Rest Of Packet\n");
+			//DEBUGDEBUG("Reading Rest Of Packet\n");
 			linxDev.UartRead(LinxSerialListenerChan, (recBuffer[1] - 2), (recBuffer+2), &bytesRead);
 						
 			//Full Packet Received - Compute Checksum - Process Packet If Checksum Passes
 			if(ChecksumPassed(recBuffer))
 			{
-				DEBUG("Checksum Passed\n");
+				//DEBUGDEBUG("Checksum Passed\n");
 				//Process Packet
 				ProcessCommand(recBuffer, sendBuffer, linxDev);
 			
@@ -93,8 +91,8 @@ int LinxSerialListener::Connected(LinxDevice &linxDev)
 			else
 			{         
 				//Checksum Failed
-				DEBUG("Checksum Failed\n");
-				DEBUGCMDPACKET(recBuffer);
+				//DEBUGDEBUG("Checksum Failed\n");
+				//DEBUGDEBUGCMDPACKET(recBuffer);
 				//Flush
 				linxDev.UartGetBytesAvailable(LinxSerialListenerChan, &bytesAvailable);
 				linxDev.UartRead(LinxSerialListenerChan, bytesAvailable, recBuffer, &bytesRead);
@@ -103,7 +101,7 @@ int LinxSerialListener::Connected(LinxDevice &linxDev)
 		else
 		{
 			//SoF Failed, Flush
-			DEBUG("SoF Failed\n");
+			//DEBUGDEBUG("SoF Failed\n");
 			//Flush
 			linxDev.UartGetBytesAvailable(LinxSerialListenerChan, &bytesAvailable);
 			linxDev.UartRead(LinxSerialListenerChan, bytesAvailable, recBuffer, &bytesRead); 

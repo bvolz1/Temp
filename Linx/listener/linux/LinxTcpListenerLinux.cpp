@@ -10,8 +10,6 @@
 #include <unistd.h>
 #include <netinet/in.h>
 
-
-#include "../../LinxCommon.h"
 #include "../LinxListener.h"
 #include "../../device/LinxDevice.h"
 #include "LinxTcpListenerLinux.h"
@@ -32,18 +30,18 @@ LinxTcpListenerLinux::LinxTcpListenerLinux()
 
 int LinxTcpListenerLinux::Start(unsigned int serverPort)
 {
-	DEBUG("Starting LINX TCP Server!");
+	//DEBUG("Starting LINX TCP Server!");
 	
 	//Create the TCP socket
 	if((serversock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0) 
 	{
-		DEBUG("Failed To Create Socket");
+		//DEBUG("Failed To Create Socket");
 		State = EXIT;
 		return -1;
 	}
 	else
 	{
-		DEBUG("Successfully Created Socket");
+		//DEBUG("Successfully Created Socket");
 	}
 
 	//Construct the server sockaddr_in structure
@@ -55,34 +53,34 @@ int LinxTcpListenerLinux::Start(unsigned int serverPort)
 	//Bind the server socket
 	if( bind(serversock, (struct sockaddr *) &echoserver, sizeof(echoserver)) < 0)
 	{
-		DEBUG("Failed To Bind Sever Socket");
+		//DEBUG("Failed To Bind Sever Socket");
 		State = EXIT;
 		return -1;
 	}
 	else
 	{
-		DEBUG("Successfully Bound Sever Socket");
+		//DEBUG("Successfully Bound Sever Socket");
 	}
 	
 	//Listen on the server socket
 	if(listen(serversock, MAX_PENDING_CONS) < 0)
 	{
-		DEBUG("Failed To Start Listening On Sever Socket");
+		//DEBUG("Failed To Start Listening On Sever Socket");
 		State = EXIT;
 		return -1;
 	}
 	else
 	{
-		DEBUG("Successfully Started Listening On Sever Socket");
+		//DEBUG("Successfully Started Listening On Sever Socket");
 		State = LISTENING;
 	}
 	
 	return 0;
 }
 
-int LinxTcpListenerLinux::Accept()
+int LinxTcpListenerLinux::Accept(LinxDevice &linxDev)
 {
-	DEBUG("Waiting For Client Connection\n");
+	//DEBUG("Waiting For Client Connection\n");
 	
 	unsigned int clientlen = sizeof(echoclient);
 	
@@ -96,16 +94,16 @@ int LinxTcpListenerLinux::Accept()
 	{		
 		if ( setsockopt (clientsock, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout)) < 0)
 		{
-			DEBUG("Failed To Set Socket Receive Time-out\n");
+			//DEBUG("Failed To Set Socket Receive Time-out\n");
 			return -1;
 		}
 		else
 		{
 			
-			TCPUpdateTime = GetSeconds();
+			TCPUpdateTime = linxDev.GetSeconds();
 			State = CONNECTED;
-			DEBUG(inet_ntoa(echoclient.sin_addr));
-			DEBUG("Successfully Connected\n");
+			//DEBUG(inet_ntoa(echoclient.sin_addr));
+			//DEBUG("Successfully Connected\n");
 		}		
 	}
 	return 0;	
@@ -136,7 +134,7 @@ int LinxTcpListenerLinux::Connected(LinxDevice &linxDev)
 				//Partial Packet, Make Sure Packet Size Will Fit In Buffer, If It Will Loop To Wait For Remainder Of Packet
 				if(packetSize > LISTENER_BUFFER_SIZE)
 				{
-					DEBUG("Packet Size Too Large For Buffer");
+					//DEBUG("Packet Size Too Large For Buffer");
 					State = EXIT;
 					return -1;
 				}				
@@ -148,7 +146,7 @@ int LinxTcpListenerLinux::Connected(LinxDevice &linxDev)
 				if( received = read(clientsock, recBuffer, packetSize) < 0 )
 				{
 					//Failed To Read Packet From Buffer
-					DEBUG("Failed To Read Packet From Buffer");
+					//DEBUG("Failed To Read Packet From Buffer");
 					State = EXIT;
 					return -1;				
 				}
@@ -163,7 +161,7 @@ int LinxTcpListenerLinux::Connected(LinxDevice &linxDev)
 						if(status == L_DISCONNECT)
 						{
 							//Host Disconnected.  Listen For New Connection														
-							DEBUG("Disconnect");
+							//DEBUG("Disconnect");
 							State = LISTENING;							
 						}	
 										
@@ -172,7 +170,7 @@ int LinxTcpListenerLinux::Connected(LinxDevice &linxDev)
 						unsigned char bytesToSend = sendBuffer[1];
 						if( send(clientsock, sendBuffer, bytesToSend, 0) != bytesToSend)
 						{
-							DEBUG("Failed To Send Response Packet");
+							//DEBUG("Failed To Send Response Packet");
 							State = EXIT;
 							return -1;
 						}
@@ -181,7 +179,7 @@ int LinxTcpListenerLinux::Connected(LinxDevice &linxDev)
 					else
 					{
 						//Checksum Failed
-						DEBUG("Checksum Failed");
+						//DEBUG("Checksum Failed");
 						recv(clientsock, recBuffer, LISTENER_BUFFER_SIZE, MSG_DONTWAIT);	
 					}
 				}
@@ -190,7 +188,7 @@ int LinxTcpListenerLinux::Connected(LinxDevice &linxDev)
 		else
 		{
 			//Bad SoF, Flush Socket
-			DEBUG("Bad SoF");
+			//DEBUG("Bad SoF");
 			recv(clientsock, recBuffer, LISTENER_BUFFER_SIZE, MSG_DONTWAIT);
 			printf("Got %s\n", recBuffer);
 		}
@@ -216,7 +214,7 @@ int LinxTcpListenerLinux::Peek(unsigned char * recBuffer, int bufferSize)
 		if(errno  == EWOULDBLOCK)
 		{
 			//Time-out Waiting For Data
-			DEBUG("Time-out Waiting For Data");			
+			//DEBUG("Time-out Waiting For Data");			
 		}			
 		else
 		{
@@ -227,7 +225,7 @@ int LinxTcpListenerLinux::Peek(unsigned char * recBuffer, int bufferSize)
 	else	 if(peekReceived == 0)
 	{		
 		//Client Disconnected
-		DEBUG("Client Disconnected");			
+		//DEBUG("Client Disconnected");			
 		State = LISTENING;		
 	}
 	else

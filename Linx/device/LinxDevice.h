@@ -5,11 +5,9 @@
 **  Includes
 ****************************************************************************************/		
 
-
 /****************************************************************************************
 **  Defines
 ****************************************************************************************/		
-
 //GPIO
 #ifndef INPUT
 	#define INPUT 0x00
@@ -45,6 +43,8 @@
 /****************************************************************************************
 **  Typedefs
 ****************************************************************************************/		
+enum LinxStatus {L_OK, L_FUNCTION_NOT_SUPPORTED, L_REQUEST_RESEND, L_UNKNOWN_ERROR, L_DISCONNECT};
+
 typedef enum DioStatus
 {
 	LDIGITAL_PIN_DNE=128, 
@@ -171,6 +171,9 @@ class LinxDevice
 		
 		//General - 
 		unsigned char ReverseBits(unsigned char b);
+		virtual unsigned long GetMilliSeconds() = 0;
+		virtual unsigned long GetSeconds() = 0;
+		
 				
 	private:
 		/****************************************************************************************

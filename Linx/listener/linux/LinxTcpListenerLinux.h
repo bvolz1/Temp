@@ -40,7 +40,7 @@ class LinxTcpListenerLinux : public LinxTcpListener
 		**  Functions
 		****************************************************************************************/
 		int Start(unsigned int serverPort);
-		int Accept();
+		int Accept(LinxDevice &linxDev);
 		int Connected(LinxDevice &linxDev);
 		int Exit();
 	
