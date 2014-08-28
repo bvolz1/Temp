@@ -1,20 +1,14 @@
 all: release debug main
 	
 release:
-	g++ LinxTcpDaemon.cpp listener/LinxListener.cpp listener/LinxTcpListener.cpp listener/linux/LinxTcpListenerLinux.cpp LinxCommon.cpp device/LinxDevice.cpp device/raspberrypi/LinxRaspberryPi.cpp device/raspberrypi/LinxRaspberryPi-B.cpp -lrt -o LinxRelease.out
+	g++ LinxTcpDaemon.cpp  listener/LinxTcpListener.cpp listener/linux/LinxTcpListenerLinux.cpp   device/raspberrypi/LinxRaspberryPi-B.cpp -lrt -o LinxRelease.out
 	
 debug:
-	g++ LinxTcpDaemon.cpp listener/LinxListener.cpp listener/LinxTcpListener.cpp listener/linux/LinxTcpListenerLinux.cpp LinxCommon.cpp device/LinxDevice.cpp device/raspberrypi/LinxRaspberryPi.cpp device/raspberrypi/LinxRaspberryPi-B.cpp -lrt -DDEBUG_ENABLED=1 -o LinxDebug.out
+	g++ LinxTcpDaemon.cpp listener/LinxListener.cpp listener/LinxTcpListener.cpp listener/linux/LinxTcpListenerLinux.cpp device/LinxDevice.cpp device/raspberrypi/LinxRaspberryPi.cpp device/raspberrypi/LinxRaspberryPi-B.cpp -lrt -DDEBUG_ENABLED=1 -o LinxDebug.out
 	
 serial: 
-	g++ LinxSerialDaemon.cpp listener/LinxListener.cpp listener/LinxSerialListener.cpp LinxCommon.cpp device/LinxDevice.cpp device/raspberrypi/LinxRaspberryPi.cpp device/raspberrypi/LinxRaspberryPi-B.cpp -lrt -DDEBUG_ENABLED=1 -o serialdebug.out
-	
-main:
-	g++ main.cpp LinxCommon.cpp device/LinxDevice.cpp device/raspberrypi/LinxRaspberryPi.cpp device/raspberrypi/LinxRaspberryPi-B.cpp -lrt  -o main.out
-	
-maindebug:
-	g++ main.cpp LinxCommon.cpp device/LinxDevice.cpp device/raspberrypi/LinxRaspberryPi.cpp device/raspberrypi/LinxRaspberryPi-B.cpp -lrt  -DDEBUG_ENABLED=1 -o maindebug.out
-	
+	g++ LinxSerialDaemon.cpp listener/LinxListener.cpp listener/LinxSerialListener.cpp device/LinxDevice.cpp device/raspberrypi/LinxRaspberryPi.cpp device/raspberrypi/LinxRaspberryPi-B.cpp -lrt -DLINXDEVICE=LinxRaspberryPiB -DDEBUG_ENABLED=1 -o serialdebug.out
+
 uno:	
 	cd device/wiring/arduino/uno && make	
 
