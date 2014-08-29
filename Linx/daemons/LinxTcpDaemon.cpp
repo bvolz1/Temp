@@ -13,21 +13,42 @@
 #include <unistd.h>
 #include <netinet/in.h>
 
-#include "device/LinxDevice.h"
-#include "device/raspberrypi/LinxRaspberryPi.h"
-#include "device/raspberrypi/LinxRaspberryPi-B.h"
+//Listener
+#include "../listener/LinxListener.h"
+#include "../listener/LinxTcpListener.h"
 
-#include "listener/LinxListener.h"
-#include "listener/LinxTcpListener.h"
-#include "listener/linux/LinxTcpListenerLinux.h"
+//Device Generic
+#include "../device/LinxDevice.h"
+
+//Device Specific
+#if LINXWIRING
+	#include "../device/wiring/LinxWiringDevice.h"
+#endif
+
+#if LINXARDUINO	
+	#include "../device/wiring/arduino/LinxArduino.h"
+	#include "../device/wiring/arduino/uno/LinxArduinoUno.h"
+#endif
+
+#if LINXRASPBERRYPI
+	#include "../listener/linux/LinxTcpListenerLinux.h"
+	#include "../device/raspberrypi/LinxRaspberryPi.h"	
+	#include "../device/raspberrypi/LinxRaspberryPi-B.h"	
+#endif
+
 
 /****************************************************************************************
 ** Variables
 ****************************************************************************************/
-LinxRaspberryPiB LinxDev;	
-LinxTcpListenerLinux LinxServer;
+LinxTcpListenerLinux LinxConnection;
+LINXDEVICE LinxDev;	
 
-int main(int argc, char *argv[])
+#if LINXWIRING
+	void setup(){};
+	void loop()
+#else
+	int main(int argc, char *argv[])
+#endif
 {
 
 	//LinxDev.DebugPrint((char*)"\nStarting LVH LINX Daemon...");
@@ -37,16 +58,16 @@ int main(int argc, char *argv[])
 	{	
 	
 		//TCP Server State Machine
-		switch(LinxServer.State)
+		switch(LinxConnection.State)
 		{
 			case START:
 				//LinxDev.DebugPrint((char*)"Start State");
-				LinxServer.Start(6999);
+				LinxConnection.Start(6999);
 				break;
 			
 			case LISTENING:
 				//LinxDev.DebugPrint((char*)"Listening State");
-				LinxServer.Accept(LinxDev);
+				LinxConnection.Accept(LinxDev);
 				break;	
 			
 			case AVAILABLE:
@@ -57,18 +78,18 @@ int main(int argc, char *argv[])
 				
 			case CONNECTED:
 				//LinxDev.DebugPrint((char*)"Connected State");
-				LinxServer.Connected(LinxDev);
+				LinxConnection.Connected(LinxDev);
 				break;
 
 			case CLOSE:
 				//LinxDev.DebugPrint((char*)"Restarting LINX Server");
-				LinxServer.Close();
-				LinxServer.State = START;
+				LinxConnection.Close();
+				LinxConnection.State = START;
 				break;					
 				
 			case EXIT:
 				//LinxDev.DebugPrint((char*)"Exit State\n");
-				LinxServer.Exit();
+				LinxConnection.Exit();
 				exit(-1);
 				break;				
 		}

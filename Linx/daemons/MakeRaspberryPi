@@ -1,18 +1,33 @@
-
 CC= g++
-CORE_SRC = ../listener/LinxListener.cpp ../device/LinxDevice.cpp ../device/raspberrypi/LinxRaspberryPi.cpp
-LISTENER_SRC = LinxSerialDaemon.cpp ../listener/LinxSerialListener.cpp
+CORE_SRC = ../device/LinxDevice.cpp ../device/raspberrypi/LinxRaspberryPi.cpp
+LISTENER_SRC = ../listener/LinxListener.cpp
+SERIAL_LISTENER_SRC = LinxSerialDaemon.cpp ../listener/LinxSerialListener.cpp
+TCP_LISTENER_SRC = LinxTcpDaemon.cpp ../listener/LinxTcpListener.cpp ../listener/linux/LinxTcpListenerLinux.cpp
 CLFAGS = -lrt -DLINXRASPBERRYPI=1
+OBJ_DIR = ../bin/raspberrypi
+EXE_SUFFIX = 
+
+
+ifdef SERIAL_LISTENER
+	LISTENER_SRC += $(SERIAL_LISTENER_SRC)
+	CFLAGS += 
+	EXE_SUFFIX = serial
+endif
+
+ifdef TCP_LISTENER
+	LISTENER_SRC += $(TCP_LISTENER_SRC)
+	EXE_SUFFIX = tcp
+endif
 
 
 
 
-all:
+#BUILD CORE SOURCE BASED ON TARGET HERE???
+raspberrypia:
+	$(info Raspberry Pi A Not Yet Implmented)
 
-RaspberryPiA:
+raspberrypib:
+	$(CC) $(LISTENER_SRC) $(CORE_SRC) ../device/raspberrypi/LinxRaspberryPi-B.cpp $(CLFAGS) -DLINXDEVICE=LinxRaspberryPiB -o $(OBJ_DIR)$@$(EXE_SUFFIX).out
 
-RaspberryPiB:
-	$(CC) $(LISTENER_SRC) $(CORE_SRC) ../device/raspberrypi/LinxRaspberryPi-B.cpp $(CLFAGS) -DLINXDEVICE=LinxRaspberryPiB -o Serial_RaspberryPiB.out
-
-RaspberryPi+:
-
+raspberrypibplus:
+	$(info Raspberry Pi B+ Not Yet Implmented)

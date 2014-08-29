@@ -1,8 +1,25 @@
 AVRDDUDE     = /usr/bin/avrdude
 AVRDUDE_CONF = /etc/avrdude.conf
-BOARD_TAG    = uno
-USER_CPP =  ../listener/LinxSerialListener.cpp ../listener/LinxListener.cpp ../device/LinxDevice.cpp ../device/wiring/arduino/uno/LinxArduinoUno.cpp ../device/wiring/arduino/LinxArduino.cpp ../device/wiring/LinxWiringDevice.cpp
-USER_CPPFLAGS 	= -DLINXWIRING=1 -DLINXARDUINO=1 -DLINXDEVICE=LinxArduinoUno
-OBJDIR = ./bin/$(BOARD_TAG)
+LINX_CORE_SRC = ../device/LinxDevice.cpp ../device/wiring/LinxWiringDevice.cpp ../device/wiring/arduino/LinxArduino.cpp
+LINX_LISTENER_SRC = ../listener/LinxListener.cpp
+LINX_CPPFLAGS += -DLINXWIRING=1 -DLINXARDUINO=1 
 
+#Device Config
+ifeq ($(BOARD_TAG),uno)
+	LINX_CPPFLAGS += -DLINXDEVICE=LinxArduinoUno
+	LINX_CORE_SRC += ../device/wiring/arduino/uno/LinxArduinoUno.cpp
+endif
+
+#Listener Config
+ifdef SERIAL_LISTENER
+	LINX_CORE_SRC += LinxSerialDaemon.cpp ../listener/LinxSerialListener.cpp
+endif
+
+ifdef TCP_LISTENER
+#	LINX_CORE_SRC += 
+endif
+
+OBJDIR = ../bin/$(BOARD_TAG)
+USER_CPP += $(LINX_CORE_SRC) $(LINX_LISTENER_SRC)
+USER_CPPFLAGS += $(LINX_CPPFLAGS)
 include ~/arduino/Arduino-Makefile/Arduino.mk
