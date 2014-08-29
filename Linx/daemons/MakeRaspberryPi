@@ -19,15 +19,14 @@ ifdef TCP_LISTENER
 	EXE_SUFFIX = tcp
 endif
 
+clean:
+	rm -r $(OBJ_DIR)/*.out
 
-
-
-#BUILD CORE SOURCE BASED ON TARGET HERE???
 raspberrypia:
 	$(info Raspberry Pi A Not Yet Implmented)
 
 raspberrypib:
-	$(CC) $(LISTENER_SRC) $(CORE_SRC) ../device/raspberrypi/LinxRaspberryPi-B.cpp $(CLFAGS) -DLINXDEVICE=LinxRaspberryPiB -o $(OBJ_DIR)$@$(EXE_SUFFIX).out
+	$(CC) $(LISTENER_SRC) $(CORE_SRC) ../device/raspberrypi/LinxRaspberryPi-B.cpp $(CLFAGS) -DLINXDEVICE=LinxRaspberryPiB -o $(OBJ_DIR)/$@$(EXE_SUFFIX).out
 
 raspberrypibplus:
 	$(info Raspberry Pi B+ Not Yet Implmented)
