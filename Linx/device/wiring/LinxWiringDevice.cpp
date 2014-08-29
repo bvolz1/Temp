@@ -6,7 +6,6 @@
 #include <Wire.h>
 //#include <Serial.h>
 
-#include "../../LinxCommon.h"
 #include "../LinxDevice.h"
 #include "LinxWiringDevice.h"
 
@@ -29,7 +28,15 @@ LinxWiringDevice::LinxWiringDevice( )
 /****************************************************************************************
 **  Functions
 ****************************************************************************************/
+unsigned long LinxWiringDevice::GetMilliSeconds()
+{
+	return millis();
+}
 
+unsigned long LinxWiringDevice::GetSeconds()
+{
+	return (millis() / 1000);
+}
 //--------------------------------------------------------DIGITAL-------------------------------------------------------
 
 int LinxWiringDevice::DigitalWrite(unsigned char numPins, unsigned char* pins, unsigned char* values)

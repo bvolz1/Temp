@@ -1,0 +1,8 @@
+AVRDDUDE     = /usr/bin/avrdude
+AVRDUDE_CONF = /etc/avrdude.conf
+BOARD_TAG    = uno
+USER_CPP =  ../listener/LinxSerialListener.cpp ../listener/LinxListener.cpp ../device/LinxDevice.cpp ../device/wiring/arduino/uno/LinxArduinoUno.cpp ../device/wiring/arduino/LinxArduino.cpp ../device/wiring/LinxWiringDevice.cpp
+USER_CPPFLAGS 	= -DLINXWIRING=1 -DLINXARDUINO=1 -DLINXDEVICE=LinxArduinoUno
+OBJDIR = ./bin/$(BOARD_TAG)
+
+include ~/arduino/Arduino-Makefile/Arduino.mk

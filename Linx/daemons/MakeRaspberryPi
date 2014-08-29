@@ -1,0 +1,18 @@
+
+CC= g++
+CORE_SRC = ../listener/LinxListener.cpp ../device/LinxDevice.cpp ../device/raspberrypi/LinxRaspberryPi.cpp
+LISTENER_SRC = LinxSerialDaemon.cpp ../listener/LinxSerialListener.cpp
+CLFAGS = -lrt -DLINXRASPBERRYPI=1
+
+
+
+
+all:
+
+RaspberryPiA:
+
+RaspberryPiB:
+	$(CC) $(LISTENER_SRC) $(CORE_SRC) ../device/raspberrypi/LinxRaspberryPi-B.cpp $(CLFAGS) -DLINXDEVICE=LinxRaspberryPiB -o Serial_RaspberryPiB.out
+
+RaspberryPi+:
+

@@ -6,4 +6,3 @@ OBJDIR = ../../../../bin/$(BOARD_TAG)
 
 
 include ~/arduino/Arduino-Makefile/Arduino.mk
-

@@ -60,6 +60,9 @@ class LinxWiringDevice : public LinxDevice
 		virtual int UartWrite(unsigned char channel, unsigned char numBytes, unsigned char* sendBuffer);
 		virtual int UartClose(unsigned char channel);
 		
+		virtual unsigned long GetMilliSeconds();
+		virtual unsigned long GetSeconds();
+		
 	protected:
 		/****************************************************************************************
 		**  Variables

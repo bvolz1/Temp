@@ -9,15 +9,26 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "device/LinxDevice.h"
-#include "listener/LinxSerialListener.h"
+//Listener
+#include "../listener/LinxListener.h"
+#include "../listener/LinxSerialListener.h"
 
-#if LINXDEVICE == LinxRaspberryPiB
-	#include "device/raspberrypi/LinxRaspberryPi-B.h"	
-#elif LINXDEVICE == LinxArduinoUno
-	#include "device/wiring/arduino/uno/LinxArduinoUno.h"
-#else
+//Device Generic
+#include "../device/LinxDevice.h"
 
+//Device Specific
+#if LINXWIRING
+	#include "../device/wiring/LinxWiringDevice.h"
+#endif
+
+#if LINXARDUINO	
+	#include "../device/wiring/arduino/LinxArduino.h"
+	#include "../device/wiring/arduino/uno/LinxArduinoUno.h"
+#endif
+
+#if LINXRASPBERRYPI
+	#include "../device/raspberrypi/LinxRaspberryPi.h"	
+	#include "../device/raspberrypi/LinxRaspberryPi-B.h"	
 #endif
 
 
@@ -28,11 +39,13 @@
 LinxSerialListener LinxConnection;
 LINXDEVICE LinxDev;	
 
-int main(int argc, char *argv[])
+#if LINXWIRING
+	void setup(){};
+	void loop()
+#else
+	int main(int argc, char *argv[])
+#endif
 {
-
-	DEBUG("\nStarting LVH LINX Serial Daemon...");
-	
 	//Start LINX TCP Server	
 	while(1)
 	{	
@@ -41,7 +54,7 @@ int main(int argc, char *argv[])
 		switch(LinxConnection.State)
 		{
 			case START:
-				DEBUG("Start State");
+				
 				LinxConnection.Start(LinxDev, 0);
 				break;
 										
@@ -51,13 +64,13 @@ int main(int argc, char *argv[])
 				break;
 
 			case CLOSE:
-				DEBUG("Restarting LINX Server");
+				
 				LinxConnection.Close();
 				LinxConnection.State = START;
 				break;					
 				
 			case EXIT:
-				DEBUG("Exit State\n");
+
 				LinxConnection.Exit();
 				exit(-1);
 				break;				

@@ -1,8 +1,6 @@
-build-uno/../../device/wiring/arduino/LinxArduino.o: \
- ../../device/wiring/arduino/LinxArduino.cpp \
- ../../device/wiring/arduino/LinxArduino.h \
- ../../device/wiring/arduino/../../LinxDevice.h \
- ../../device/wiring/arduino/../LinxWiringDevice.h \
+../device/wiring/arduino/uno/LinxArduinoUno.o: \
+ ../device/wiring/arduino/uno/LinxArduinoUno.cpp \
+ /usr/share/arduino/libraries/SPI/SPI.h \
  /usr/share/arduino/hardware/arduino//cores/arduino/Arduino.h \
  /usr/share/arduino/hardware/arduino//cores/arduino/binary.h \
  /usr/share/arduino/hardware/arduino//cores/arduino/WCharacter.h \
@@ -13,4 +11,10 @@ build-uno/../../device/wiring/arduino/LinxArduino.o: \
  /usr/share/arduino/hardware/arduino//cores/arduino/Printable.h \
  /usr/share/arduino/hardware/arduino//cores/arduino/new.h \
  /usr/share/arduino/hardware/arduino//variants/standard/pins_arduino.h \
- ../../device/wiring/arduino/../../LinxDevice.h
+ ../device/wiring/arduino/uno/../../../LinxDevice.h \
+ ../device/wiring/arduino/uno/../../LinxWiringDevice.h \
+ ../device/wiring/arduino/uno/../../../LinxDevice.h \
+ ../device/wiring/arduino/uno/../LinxArduino.h \
+ ../device/wiring/arduino/uno/../../../LinxDevice.h \
+ ../device/wiring/arduino/uno/../../LinxWiringDevice.h \
+ ../device/wiring/arduino/uno/LinxArduinoUno.h
