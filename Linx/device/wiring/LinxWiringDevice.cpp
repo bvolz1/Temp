@@ -1,7 +1,14 @@
 /****************************************************************************************
 **  Includes
 ****************************************************************************************/	
-#include <Arduino.h>
+#if DEVICE_FAMILY == 2	//Arduino
+	#include <Arduino.h>
+#endif
+
+#if DEVICE_FAMILY == 1	//ChipKIT
+	#include <WProgram.h>
+#endif
+
 #include <SPI.h>
 #include <Wire.h>
 //#include <Serial.h>
@@ -113,8 +120,18 @@ int LinxWiringDevice::SpiWriteRead(unsigned char channel, unsigned char frameSiz
 	return 0;
 }
 
-		
 //--------------------------------------------------------I2C-----------------------------------------------------------
+
+//Helper To Deal With Arduino API Changes
+void LinxWireWrite(unsigned char data)
+{
+  #if ARDUINO_VERSION < 100
+    Wire.send(data);
+  #else
+    Wire.write(data);
+  #endif 
+}
+
 int LinxWiringDevice::I2cOpenMaster(unsigned char channel)
 {
 	if(*(I2cRefCount+channel) > 0)
@@ -136,7 +153,8 @@ int LinxWiringDevice::I2cSetSpeed(unsigned char channel, unsigned long speed, un
 }
 
 int LinxWiringDevice::I2cWrite(unsigned char channel, unsigned char slaveAddress, unsigned char eofConfig, unsigned char numBytes, unsigned char* sendBuffer)
-{
+{ 
+	#if ARDUINO_VERSION >= 100
 		Wire.beginTransmission(slaveAddress);
 		Wire.write(sendBuffer, numBytes);
 		
@@ -153,44 +171,69 @@ int LinxWiringDevice::I2cWrite(unsigned char channel, unsigned char slaveAddress
 			//EOF Not Supported, Stop Bus
 			Wire.endTransmission(true);
 			return LI2C_EOF;
-		}
-	
+		}	
 	return L_OK;
+	#else
+		if(eofConfig != EOF_STOP)
+		{
+			//EOF Not Supported, Stop Bus
+			return LI2C_EOF;
+		}
+		Wire.beginTransmission(slaveAddress);
+		for(int i=0; i<numBytes; i++)
+		{
+			Wire.send(*(sendBuffer+i));
+		}
+		Wire.endTransmission();
+		return 0;
+	#endif	
 }
 
 int LinxWiringDevice::I2cRead(unsigned char channel, unsigned char slaveAddress, unsigned char eofConfig, unsigned char numBytes, unsigned int timeout, unsigned char* recBuffer)
 {
-	if(eofConfig == EOF_STOP)
-	{
-		Wire.requestFrom(slaveAddress, numBytes, (uint8_t)1);
-	}
-	else if (eofConfig == EOF_RESTART)
-	{
-		Wire.requestFrom(slaveAddress, numBytes, 0);
-	}
-	else
-	{
-		//EOF Not Supported		
-		return LI2C_EOF;
-	}
-	
-	//Wait For Data, Potentially Timeout
-	unsigned long tickCount = millis();
-	while(Wire.available() < numBytes)
-	{
-		if( (millis() - tickCount) > timeout)
+	#if ARDUINO_VERSION >= 100
+		if(eofConfig == EOF_STOP)
 		{
-			return LI2C_READ_FAIL;
+			Wire.requestFrom(slaveAddress, numBytes, (uint8_t)1);
 		}
-	}
-	
-	//Data Read, Read And Return
-	for(int i=0; i<numBytes; i++)
-	{
-		*(recBuffer+i) = Wire.read();
-	}
-	
-	return L_OK;
+		else if (eofConfig == EOF_RESTART)
+		{
+			Wire.requestFrom(slaveAddress, numBytes, 0);
+		}
+		else
+		{
+			//EOF Not Supported		
+			return LI2C_EOF;
+		}
+	#else
+		if(eofConfig != EOF_STOP)
+		{
+			//EOF Not Supported		
+			return LI2C_EOF;
+		}
+		Wire.requestFrom(slaveAddress, numBytes);
+	#endif
+		
+		//Wait For Data, Potentially Timeout
+		unsigned long tickCount = millis();
+		while(Wire.available() < numBytes)
+		{
+			if( (millis() - tickCount) > timeout)
+			{
+				return LI2C_READ_FAIL;
+			}
+		}
+		
+		//Data Read, Read And Return
+		for(int i=0; i<numBytes; i++)
+		{
+			#if ARDUINO_VERSION >= 100
+				*(recBuffer+i) = Wire.read();
+			#else
+				*(recBuffer+i) = Wire.receive();
+			#endif			
+		}	
+		return L_OK;
 }
 
 int LinxWiringDevice::I2cClose(unsigned char channel)
@@ -198,7 +241,6 @@ int LinxWiringDevice::I2cClose(unsigned char channel)
 	//Function Not Supported
 	return L_FUNCTION_NOT_SUPPORTED;
 }
-
 		
 //--------------------------------------------------------UART----------------------------------------------------------
 int LinxWiringDevice::UartOpen(unsigned char channel, unsigned long baudRate, unsigned long* actualBaud)
@@ -235,22 +277,42 @@ int LinxWiringDevice::UartGetBytesAvailable(unsigned char channel, unsigned char
 
 int LinxWiringDevice::UartRead(unsigned char channel, unsigned char numBytes, unsigned char* recBuffer, unsigned char* numBytesRead)
 {
-	*numBytesRead = Serial.readBytes((char*)recBuffer, numBytes);
-	
-	if(*numBytesRead !=numBytes)
-	{
-		return LUART_READ_FAIL;
-	}
-	return 0;
+	#if ARDUINO_VERSION >= 100
+		*numBytesRead = Serial.readBytes((char*)recBuffer, numBytes);
+		
+		if(*numBytesRead !=numBytes)
+		{
+			return LUART_READ_FAIL;
+		}
+		return 0;
+	#else
+		for(int i=0; i<numBytes; i++)
+		{
+			int data = Serial.read();
+			if(data < 0)
+			{
+				return LUART_READ_FAIL;
+			}
+			else
+			{
+				*(recBuffer+i) = (char)data;
+			}
+		}
+		return 0;
+	#endif
 }
 
 int LinxWiringDevice::UartWrite(unsigned char channel, unsigned char numBytes, unsigned char* sendBuffer)
 {
-	unsigned char bytesSent = Serial.write(sendBuffer, numBytes);
-	if(bytesSent != numBytes)
-	{
-		return LUART_WRITE_FAIL;
-	}
+	#if ARDUINO_VERSION >= 100
+		unsigned char bytesSent = Serial.write(sendBuffer, numBytes);
+		if(bytesSent != numBytes)
+		{
+			return LUART_WRITE_FAIL;
+		}
+	#else
+		Serial.write(sendBuffer, numBytes);
+	#endif	
 	return 0;
 }
 

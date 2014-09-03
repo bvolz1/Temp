@@ -2,11 +2,13 @@ AVRDDUDE     = /usr/bin/avrdude
 AVRDUDE_CONF = /etc/avrdude.conf
 LINX_CORE_SRC = ../device/LinxDevice.cpp ../device/wiring/LinxWiringDevice.cpp ../device/wiring/arduino/LinxArduino.cpp
 LINX_LISTENER_SRC = ../listener/LinxListener.cpp
-LINX_CPPFLAGS += -DLINXWIRING=1 -DLINXARDUINO=1 
+
+LINX_CPPFLAGS += -DDEVICE_FAMILY=2
+LINX_CPPFLAGS += -DARDUINO_VERSION=100
 
 #Device Config
 ifeq ($(BOARD_TAG),uno)
-	LINX_CPPFLAGS += -DLINXDEVICE=LinxArduinoUno
+	LINX_CPPFLAGS += -DDEVICE_ID=0
 	LINX_CORE_SRC += ../device/wiring/arduino/uno/LinxArduinoUno.cpp
 endif
 

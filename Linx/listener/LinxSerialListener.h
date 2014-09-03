@@ -26,7 +26,7 @@ class LinxSerialListener : public LinxListener
 		**  Variables
 		****************************************************************************************/		
 		LinxListenerState State;
-		unsigned char LinxSerialListenerChan;
+		//unsigned char LinxSerialListenerChan;
 		
 		/****************************************************************************************
 		**  Constructors

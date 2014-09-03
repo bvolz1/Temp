@@ -1,0 +1,27 @@
+BOARD_TAG    = mega_pic32
+MPIDE_DIR =/home/pi/mpide
+ARDUINO_LIB_PATH =/home/pi/mpide/hardware/pic32/libraries
+
+LINX_CORE_SRC = ../device/LinxDevice.cpp ../device/wiring/LinxWiringDevice.cpp ../device/wiring/arduino/LinxArduino.cpp
+LINX_LISTENER_SRC = ../listener/LinxListener.cpp
+LINX_CPPFLAGS += -DDEVICE_FAMILY=1
+
+LINX_CPPFLAGS += -DDEVICE_ID=2
+LINX_CPPFLAGS += -ARDUINO_VERSION=23
+LINX_CORE_SRC += ../device/wiring/chipkit/LinxChipkit.cpp ../device/wiring/chipkit/max32/LinxChipkitMax32.cpp
+
+
+#Listener Config
+#ifdef SERIAL_LISTENER
+LINX_CORE_SRC += LinxSerialDaemon.cpp ../listener/LinxSerialListener.cpp
+#endif
+
+ifdef TCP_LISTENER
+#	LINX_CORE_SRC += 
+endif
+
+OBJDIR = ../bin/$(BOARD_TAG)
+USER_CPP += $(LINX_CORE_SRC) $(LINX_LISTENER_SRC)
+USER_CPPFLAGS += $(LINX_CPPFLAGS)
+
+include ../../../../arduino/Arduino-Makefile/chipKIT.mk
